@@ -1,0 +1,230 @@
+{
+  "scenario_id": "validation_procurement_audit_packet",
+  "title": "Procurement audit packet under signed-source rule",
+  "family": "evidence_synthesis",
+  "split": "validation",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_validation",
+  "budget_ceiling": {
+    "max_steps": 10,
+    "max_visible_items": 6,
+    "max_tool_calls": 0
+  },
+  "intent_contract": {
+    "task_statement": "Choose the source packet for the procurement audit response.",
+    "success_criteria": [
+      "Use the signed procurement packet that directly supports the audit response.",
+      "Preserve provenance for the selected packet."
+    ],
+    "hard_constraints": [
+      "Use signed procurement materials only.",
+      "Do not use draft planning notes as the audit source of record."
+    ],
+    "soft_preferences": [
+      "Prefer the packet that can be attached directly to the response."
+    ],
+    "forbidden_actions": [
+      "Cite an unsigned planning note as the audit record."
+    ],
+    "allowed_scope_expansions": [
+      "You may mention if a draft note informed the discussion but not the official response."
+    ],
+    "evidence_requirements": [
+      "The selected packet must document the approved vendor decision directly."
+    ],
+    "stop_conditions": [
+      "Stop after choosing one source packet."
+    ],
+    "version": "contract/v1"
+  },
+  "corpus": [
+    {
+      "doc_id": "signed_packet",
+      "title": "Signed procurement packet",
+      "text": "Signed packet: vendor award approved by procurement and legal on March 8."
+    },
+    {
+      "doc_id": "draft_note",
+      "title": "Draft sourcing note",
+      "text": "Draft note: team prefers vendor Alpha but approval signatures are still pending."
+    }
+  ],
+  "events": [
+    {
+      "event_id": "procurement-subgoal",
+      "kind": "subgoal",
+      "text": "Identify the signed packet that can support the audit response.",
+      "salience": 8,
+      "payload": {
+        "subgoal": "select the signed procurement source for the audit"
+      }
+    },
+    {
+      "event_id": "procurement-evidence-signed",
+      "kind": "evidence",
+      "text": "The signed procurement packet confirms the vendor award was approved on March 8.",
+      "salience": 9,
+      "payload": {
+        "evidence_id": "signed_packet",
+        "summary": "Signed procurement packet records the approved vendor award."
+      }
+    },
+    {
+      "event_id": "procurement-evidence-draft",
+      "kind": "evidence",
+      "text": "A draft sourcing note discusses a preferred vendor before signatures are complete.",
+      "salience": 3,
+      "payload": {
+        "evidence_id": "draft_note",
+        "summary": "Draft sourcing note is unsigned and not the audit record."
+      }
+    },
+    {
+      "event_id": "procurement-decision",
+      "kind": "decision",
+      "text": "Choose the source packet for the procurement audit response.",
+      "salience": 10,
+      "payload": {
+        "correct_option_id": "use_signed_packet",
+        "required_constraints": [
+          "Use signed procurement materials only.",
+          "Do not use draft planning notes as the audit source of record."
+        ],
+        "required_evidence": [
+          "signed_packet"
+        ],
+        "bias_if_constraints_missing": "use_draft_note",
+        "bias_if_evidence_missing": "use_draft_note",
+        "options": [
+          {
+            "option_id": "use_signed_packet",
+            "label": "Use the signed procurement packet.",
+            "appeal": 1,
+            "supports_goal": true,
+            "supported_by": [
+              "signed_packet"
+            ],
+            "violates_constraints": [],
+            "evidence_to_accept": [
+              "signed_packet"
+            ],
+            "ledger_updates": {
+              "plan_steps": [
+                "Attach the signed procurement packet to the audit response."
+              ]
+            }
+          },
+          {
+            "option_id": "use_draft_note",
+            "label": "Use the draft sourcing note because it is shorter.",
+            "appeal": 4,
+            "supports_goal": true,
+            "supported_by": [
+              "draft_note"
+            ],
+            "violates_constraints": [
+              "Use signed procurement materials only.",
+              "Do not use draft planning notes as the audit source of record."
+            ],
+            "evidence_to_accept": [
+              "draft_note"
+            ],
+            "ledger_updates": {
+              "risk_flags": [
+                "Audit response cites an unsigned draft note."
+              ]
+            },
+            "drift_label_if_chosen": "evidence_drift"
+          }
+        ]
+      }
+    }
+  ],
+  "gold_checkpoints": [
+    {
+      "checkpoint_id": "procurement-cp-1",
+      "after_event_id": "procurement-evidence-signed",
+      "required_constraints": [],
+      "required_evidence_ids": [
+        "signed_packet"
+      ],
+      "required_decisions": [],
+      "forbidden_drift_labels": [],
+      "required_fact_contents": [
+        "Signed procurement packet records the approved vendor award."
+      ],
+      "required_outstanding_work": [
+        "Use the signed procurement packet that directly supports the audit response."
+      ],
+      "required_active_subgoal": "select the signed procurement source for the audit",
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Signed procurement packet records the approved vendor award.",
+          "evidence_ids": [
+            "signed_packet"
+          ]
+        }
+      ]
+    },
+    {
+      "checkpoint_id": "procurement-cp-2",
+      "after_event_id": "procurement-decision",
+      "required_constraints": [
+        "Use signed procurement materials only.",
+        "Do not use draft planning notes as the audit source of record."
+      ],
+      "required_evidence_ids": [
+        "signed_packet"
+      ],
+      "required_decisions": [
+        "Use the signed procurement packet."
+      ],
+      "forbidden_drift_labels": [
+        "evidence_drift"
+      ],
+      "required_fact_contents": [
+        "Signed procurement packet records the approved vendor award."
+      ],
+      "required_ledger_decisions": [
+        "Use the signed procurement packet."
+      ],
+      "required_outstanding_work": [
+        "Use the signed procurement packet that directly supports the audit response.",
+        "Preserve provenance for the selected packet."
+      ],
+      "required_plan_steps": [
+        "Attach the signed procurement packet to the audit response."
+      ],
+      "required_accepted_evidence_ids": [
+        "signed_packet"
+      ],
+      "required_active_subgoal": "select the signed procurement source for the audit",
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Signed procurement packet records the approved vendor award.",
+          "evidence_ids": [
+            "signed_packet"
+          ]
+        },
+        {
+          "bucket": "decisions",
+          "content": "Use the signed procurement packet.",
+          "evidence_ids": [
+            "signed_packet"
+          ]
+        }
+      ]
+    }
+  ],
+  "gold_outcome": {
+    "required_decision_ids": [
+      "use_signed_packet"
+    ]
+  },
+  "tags": [
+    "validation",
+    "wave1"
+  ]
+}

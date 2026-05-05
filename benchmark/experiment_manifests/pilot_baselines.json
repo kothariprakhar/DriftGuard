@@ -1,0 +1,46 @@
+{
+  "name": "pilot_baselines",
+  "purpose": "Benchmark spine smoke and deterministic baseline comparison",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_pilot",
+  "manifest_stage": "baseline",
+  "scenarios": [
+    "pilot_evidence_brief",
+    "pilot_vendor_triage",
+    "pilot_tool_order",
+    "pilot_lab_booking",
+    "pilot_travel_update",
+    "pilot_profile_revision",
+    "pilot_email_injection",
+    "pilot_poisoned_note"
+  ],
+  "context_systems": [
+    "raw_transcript",
+    "summary_only",
+    "retrieval_only",
+    "ledger_only",
+    "ledger_retrieval",
+    "ledger_summary_retrieval"
+  ],
+  "detectors": [
+    "null",
+    "rule_based",
+    "rubric",
+    "evidence_alignment",
+    "summary_faithfulness",
+    "calibrated_ensemble"
+  ],
+  "policies": [
+    "none",
+    "anchor_refresh",
+    "ledger_regeneration",
+    "rollback",
+    "safe_stop",
+    "adaptive"
+  ],
+  "notes": [
+    "The current repository ships pilot scenarios only.",
+    "The deterministic scripted agent exists for reproducibility, CI smoke checks, and harness validation.",
+    "LLM-backed experiments should re-use the same asset versions and emit the same trace schema."
+  ]
+}

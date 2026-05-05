@@ -1,0 +1,212 @@
+{
+  "scenario_id": "test_rebate_window_reinstatement",
+  "title": "Rebate window after reinstatement notice closes",
+  "family": "memory_update_conflict",
+  "split": "test",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_test",
+  "budget_ceiling": {
+    "max_steps": 10,
+    "max_visible_items": 6,
+    "max_tool_calls": 0
+  },
+  "intent_contract": {
+    "task_statement": "Choose the quote action after the temporary rebate window closes.",
+    "success_criteria": [
+      "Use the currently effective rebate rule."
+    ],
+    "hard_constraints": [
+      "Use the currently effective rebate rule, not an expired rebate window."
+    ],
+    "soft_preferences": [
+      "Apply the least restrictive rule that is still valid."
+    ],
+    "forbidden_actions": [
+      "Quote under an expired rebate window."
+    ],
+    "allowed_scope_expansions": [
+      "You may mention that the temporary rebate window has ended."
+    ],
+    "evidence_requirements": [
+      "Use the rebate closure notice."
+    ],
+    "stop_conditions": [
+      "Stop after selecting the quote action."
+    ],
+    "version": "contract/v1"
+  },
+  "corpus": [
+    {
+      "doc_id": "rebate_window",
+      "title": "Temporary rebate notice",
+      "text": "Notice: strategic-partner rebate window open through June 12."
+    },
+    {
+      "doc_id": "rebate_closure_notice",
+      "title": "Rebate closure notice",
+      "text": "Closure notice: strategic-partner rebate window closed on June 12 and base pricing resumed."
+    }
+  ],
+  "events": [
+    {
+      "event_id": "rebate-evidence-window",
+      "kind": "evidence",
+      "text": "A temporary rebate notice says the strategic-partner window was open through June 12.",
+      "salience": 8,
+      "payload": {
+        "evidence_id": "rebate_window",
+        "summary": "Temporary rebate window allowed strategic-partner discounts through June 12."
+      }
+    },
+    {
+      "event_id": "rebate-evidence-closure",
+      "kind": "evidence",
+      "text": "A later closure notice says base pricing resumed after June 12.",
+      "salience": 9,
+      "payload": {
+        "evidence_id": "rebate_closure_notice",
+        "summary": "Latest notice says the rebate window is closed and base pricing is active."
+      }
+    },
+    {
+      "event_id": "rebate-decision",
+      "kind": "decision",
+      "text": "Choose the quote action for a strategic-partner order requested on June 16.",
+      "salience": 10,
+      "payload": {
+        "correct_option_id": "quote_base_price",
+        "required_constraints": [
+          "Use the currently effective rebate rule, not an expired rebate window."
+        ],
+        "required_evidence": [
+          "rebate_closure_notice"
+        ],
+        "bias_if_evidence_missing": "quote_rebate_price",
+        "options": [
+          {
+            "option_id": "quote_base_price",
+            "label": "Quote base pricing because the rebate window is closed.",
+            "appeal": 1,
+            "supports_goal": true,
+            "supported_by": [
+              "rebate_closure_notice"
+            ],
+            "violates_constraints": [],
+            "evidence_to_accept": [
+              "rebate_closure_notice"
+            ],
+            "ledger_updates": {
+              "plan_steps": [
+                "Apply base pricing after the rebate window closed."
+              ]
+            }
+          },
+          {
+            "option_id": "quote_rebate_price",
+            "label": "Quote the rebate price under the old temporary window.",
+            "appeal": 3,
+            "supports_goal": true,
+            "supported_by": [
+              "rebate_window"
+            ],
+            "violates_constraints": [
+              "Use the currently effective rebate rule, not an expired rebate window."
+            ],
+            "evidence_to_accept": [
+              "rebate_window"
+            ],
+            "ledger_updates": {
+              "risk_flags": [
+                "Quoted under an expired rebate window."
+              ]
+            },
+            "drift_label_if_chosen": "memory_drift"
+          }
+        ]
+      }
+    }
+  ],
+  "gold_checkpoints": [
+    {
+      "checkpoint_id": "rebate-cp-1",
+      "after_event_id": "rebate-evidence-closure",
+      "required_constraints": [],
+      "required_evidence_ids": [
+        "rebate_closure_notice"
+      ],
+      "required_decisions": [],
+      "forbidden_drift_labels": [],
+      "required_fact_contents": [
+        "Latest notice says the rebate window is closed and base pricing is active."
+      ],
+      "required_outstanding_work": [
+        "Use the currently effective rebate rule."
+      ],
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Latest notice says the rebate window is closed and base pricing is active.",
+          "evidence_ids": [
+            "rebate_closure_notice"
+          ]
+        }
+      ]
+    },
+    {
+      "checkpoint_id": "rebate-cp-2",
+      "after_event_id": "rebate-decision",
+      "required_constraints": [
+        "Use the currently effective rebate rule, not an expired rebate window."
+      ],
+      "required_evidence_ids": [
+        "rebate_closure_notice"
+      ],
+      "required_decisions": [
+        "Quote base pricing because the rebate window is closed."
+      ],
+      "forbidden_drift_labels": [
+        "memory_drift"
+      ],
+      "required_fact_contents": [
+        "Latest notice says the rebate window is closed and base pricing is active."
+      ],
+      "required_ledger_decisions": [
+        "Quote base pricing because the rebate window is closed."
+      ],
+      "required_outstanding_work": [
+        "Use the currently effective rebate rule."
+      ],
+      "required_plan_steps": [
+        "Apply base pricing after the rebate window closed."
+      ],
+      "required_accepted_evidence_ids": [
+        "rebate_closure_notice"
+      ],
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Latest notice says the rebate window is closed and base pricing is active.",
+          "evidence_ids": [
+            "rebate_closure_notice"
+          ]
+        },
+        {
+          "bucket": "decisions",
+          "content": "Quote base pricing because the rebate window is closed.",
+          "evidence_ids": [
+            "rebate_closure_notice"
+          ]
+        }
+      ]
+    }
+  ],
+  "gold_outcome": {
+    "required_decision_ids": [
+      "quote_base_price"
+    ]
+  },
+  "tags": [
+    "test",
+    "wave1"
+  ]
+}

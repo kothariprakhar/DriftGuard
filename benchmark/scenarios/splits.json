@@ -1,0 +1,44 @@
+{
+  "splits": [
+    {
+      "split": "pilot",
+      "public": true,
+      "frozen": true,
+      "tuning_allowed": false,
+      "hidden": false,
+      "notes": "Frozen public benchmark spine used for smoke tests and regression baselines."
+    },
+    {
+      "split": "dev",
+      "public": true,
+      "frozen": false,
+      "tuning_allowed": true,
+      "hidden": false,
+      "notes": "Wave 1 development scenarios for detector, policy, and prompt iteration."
+    },
+    {
+      "split": "validation",
+      "public": true,
+      "frozen": true,
+      "tuning_allowed": false,
+      "hidden": false,
+      "notes": "Public frozen selection slice for choosing final baselines before any test or shadow-holdout run."
+    },
+    {
+      "split": "test",
+      "public": true,
+      "frozen": true,
+      "tuning_allowed": false,
+      "hidden": false,
+      "notes": "Public locked test slice reserved for one-shot final baseline evaluation."
+    },
+    {
+      "split": "shadow_holdout",
+      "public": false,
+      "frozen": true,
+      "tuning_allowed": false,
+      "hidden": true,
+      "notes": "Maintainer-controlled holdout reserved for one-time final sanity checks."
+    }
+  ]
+}

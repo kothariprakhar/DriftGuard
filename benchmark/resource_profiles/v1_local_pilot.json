@@ -1,0 +1,10 @@
+{
+  "version": "v1_local_pilot",
+  "name": "local pilot baseline",
+  "transcript_capacity": 3,
+  "summary_capacity": 3,
+  "retrieval_k": 2,
+  "max_steps": 32,
+  "max_visible_events": 4,
+  "seed": 7
+}

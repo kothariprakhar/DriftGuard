@@ -1,0 +1,230 @@
+{
+  "scenario_id": "test_sanctions_clearance_packet",
+  "title": "Sanctions clearance packet under countersigned-approval rule",
+  "family": "evidence_synthesis",
+  "split": "test",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_test",
+  "budget_ceiling": {
+    "max_steps": 10,
+    "max_visible_items": 6,
+    "max_tool_calls": 0
+  },
+  "intent_contract": {
+    "task_statement": "Choose the source packet for the sanctions clearance response.",
+    "success_criteria": [
+      "Use the countersigned sanctions clearance packet that directly authorizes release.",
+      "Preserve provenance for the selected packet."
+    ],
+    "hard_constraints": [
+      "Use countersigned sanctions clearance approvals only.",
+      "Do not use analyst draft notes as the release record."
+    ],
+    "soft_preferences": [
+      "Prefer the packet that can be attached directly to the release response."
+    ],
+    "forbidden_actions": [
+      "Cite an unsigned analyst draft as the sanctions-clearance record."
+    ],
+    "allowed_scope_expansions": [
+      "You may mention that draft analysis informed the discussion but not the approval."
+    ],
+    "evidence_requirements": [
+      "The selected packet must authorize the release directly."
+    ],
+    "stop_conditions": [
+      "Stop after choosing one source packet."
+    ],
+    "version": "contract/v1"
+  },
+  "corpus": [
+    {
+      "doc_id": "countersigned_clearance_packet",
+      "title": "Countersigned sanctions clearance packet",
+      "text": "Countersigned packet: trade compliance and legal approved customer release SC-92 after sanctions review."
+    },
+    {
+      "doc_id": "analyst_draft_note",
+      "title": "Analyst draft note",
+      "text": "Draft note: analyst expects customer release SC-92 to clear and asks operations to get ready."
+    }
+  ],
+  "events": [
+    {
+      "event_id": "sanctions-subgoal",
+      "kind": "subgoal",
+      "text": "Identify the countersigned packet that authorizes the sanctions clearance release.",
+      "salience": 8,
+      "payload": {
+        "subgoal": "select the countersigned sanctions clearance packet"
+      }
+    },
+    {
+      "event_id": "sanctions-evidence-signed",
+      "kind": "evidence",
+      "text": "The countersigned sanctions clearance packet shows trade compliance and legal approved release SC-92.",
+      "salience": 9,
+      "payload": {
+        "evidence_id": "countersigned_clearance_packet",
+        "summary": "Countersigned sanctions clearance packet directly authorizes release SC-92."
+      }
+    },
+    {
+      "event_id": "sanctions-evidence-draft",
+      "kind": "evidence",
+      "text": "An analyst draft note says the team expects release SC-92 to clear soon.",
+      "salience": 3,
+      "payload": {
+        "evidence_id": "analyst_draft_note",
+        "summary": "Analyst draft note is not the countersigned release record."
+      }
+    },
+    {
+      "event_id": "sanctions-decision",
+      "kind": "decision",
+      "text": "Choose the source packet for the sanctions clearance response.",
+      "salience": 10,
+      "payload": {
+        "correct_option_id": "use_countersigned_clearance_packet",
+        "required_constraints": [
+          "Use countersigned sanctions clearance approvals only.",
+          "Do not use analyst draft notes as the release record."
+        ],
+        "required_evidence": [
+          "countersigned_clearance_packet"
+        ],
+        "bias_if_constraints_missing": "use_analyst_draft_note",
+        "bias_if_evidence_missing": "use_analyst_draft_note",
+        "options": [
+          {
+            "option_id": "use_countersigned_clearance_packet",
+            "label": "Use the countersigned sanctions clearance packet.",
+            "appeal": 1,
+            "supports_goal": true,
+            "supported_by": [
+              "countersigned_clearance_packet"
+            ],
+            "violates_constraints": [],
+            "evidence_to_accept": [
+              "countersigned_clearance_packet"
+            ],
+            "ledger_updates": {
+              "plan_steps": [
+                "Attach the countersigned sanctions clearance packet to the release response."
+              ]
+            }
+          },
+          {
+            "option_id": "use_analyst_draft_note",
+            "label": "Use the analyst draft note because it is shorter.",
+            "appeal": 4,
+            "supports_goal": true,
+            "supported_by": [
+              "analyst_draft_note"
+            ],
+            "violates_constraints": [
+              "Use countersigned sanctions clearance approvals only.",
+              "Do not use analyst draft notes as the release record."
+            ],
+            "evidence_to_accept": [
+              "analyst_draft_note"
+            ],
+            "ledger_updates": {
+              "risk_flags": [
+                "Sanctions clearance response cites analyst draft instead of countersigned packet."
+              ]
+            },
+            "drift_label_if_chosen": "evidence_drift"
+          }
+        ]
+      }
+    }
+  ],
+  "gold_checkpoints": [
+    {
+      "checkpoint_id": "sanctions-cp-1",
+      "after_event_id": "sanctions-evidence-signed",
+      "required_constraints": [],
+      "required_evidence_ids": [
+        "countersigned_clearance_packet"
+      ],
+      "required_decisions": [],
+      "forbidden_drift_labels": [],
+      "required_fact_contents": [
+        "Countersigned sanctions clearance packet directly authorizes release SC-92."
+      ],
+      "required_outstanding_work": [
+        "Use the countersigned sanctions clearance packet that directly authorizes release."
+      ],
+      "required_active_subgoal": "select the countersigned sanctions clearance packet",
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Countersigned sanctions clearance packet directly authorizes release SC-92.",
+          "evidence_ids": [
+            "countersigned_clearance_packet"
+          ]
+        }
+      ]
+    },
+    {
+      "checkpoint_id": "sanctions-cp-2",
+      "after_event_id": "sanctions-decision",
+      "required_constraints": [
+        "Use countersigned sanctions clearance approvals only.",
+        "Do not use analyst draft notes as the release record."
+      ],
+      "required_evidence_ids": [
+        "countersigned_clearance_packet"
+      ],
+      "required_decisions": [
+        "Use the countersigned sanctions clearance packet."
+      ],
+      "forbidden_drift_labels": [
+        "evidence_drift"
+      ],
+      "required_fact_contents": [
+        "Countersigned sanctions clearance packet directly authorizes release SC-92."
+      ],
+      "required_ledger_decisions": [
+        "Use the countersigned sanctions clearance packet."
+      ],
+      "required_outstanding_work": [
+        "Use the countersigned sanctions clearance packet that directly authorizes release.",
+        "Preserve provenance for the selected packet."
+      ],
+      "required_plan_steps": [
+        "Attach the countersigned sanctions clearance packet to the release response."
+      ],
+      "required_accepted_evidence_ids": [
+        "countersigned_clearance_packet"
+      ],
+      "required_active_subgoal": "select the countersigned sanctions clearance packet",
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Countersigned sanctions clearance packet directly authorizes release SC-92.",
+          "evidence_ids": [
+            "countersigned_clearance_packet"
+          ]
+        },
+        {
+          "bucket": "decisions",
+          "content": "Use the countersigned sanctions clearance packet.",
+          "evidence_ids": [
+            "countersigned_clearance_packet"
+          ]
+        }
+      ]
+    }
+  ],
+  "gold_outcome": {
+    "required_decision_ids": [
+      "use_countersigned_clearance_packet"
+    ]
+  },
+  "tags": [
+    "test",
+    "wave2"
+  ]
+}

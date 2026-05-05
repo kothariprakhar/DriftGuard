@@ -1,0 +1,79 @@
+{
+  "name": "pilot_suite",
+  "purpose": "Controlled perturbations for detector regression checks on the pilot benchmark.",
+  "cases": [
+    {
+      "perturbation_id": "drop-constraint-brief-rule",
+      "scenario_id": "pilot_evidence_brief",
+      "context_system": "ledger_only",
+      "detector": "rule_based",
+      "target_event_id": "brief-decision",
+      "perturbation_kind": "drop_required_constraint",
+      "expected_min_score": 1.0,
+      "expected_reason_codes": [
+        "missing_required_constraints"
+      ]
+    },
+    {
+      "perturbation_id": "drop-evidence-brief-alignment",
+      "scenario_id": "pilot_evidence_brief",
+      "context_system": "ledger_only",
+      "detector": "evidence_alignment",
+      "target_event_id": "brief-decision",
+      "perturbation_kind": "drop_required_evidence",
+      "expected_min_score": 1.0,
+      "expected_reason_codes": [
+        "weak_evidence_alignment"
+      ]
+    },
+    {
+      "perturbation_id": "drop-evidence-brief-summary",
+      "scenario_id": "pilot_evidence_brief",
+      "context_system": "summary_only",
+      "detector": "summary_faithfulness",
+      "target_event_id": "brief-decision",
+      "perturbation_kind": "drop_required_evidence",
+      "expected_min_score": 1.0,
+      "expected_reason_codes": [
+        "summary_omitted_evidence"
+      ]
+    },
+    {
+      "perturbation_id": "inject-adversarial-order-rule",
+      "scenario_id": "pilot_tool_order",
+      "context_system": "ledger_only",
+      "detector": "rule_based",
+      "target_event_id": "order-decision",
+      "perturbation_kind": "inject_adversarial_instruction",
+      "expected_min_score": 1.0,
+      "expected_reason_codes": [
+        "adversarial_instruction_visible"
+      ]
+    },
+    {
+      "perturbation_id": "clear-subgoal-order-rule",
+      "scenario_id": "pilot_tool_order",
+      "context_system": "ledger_only",
+      "detector": "rule_based",
+      "target_event_id": "order-decision",
+      "perturbation_kind": "clear_active_subgoal",
+      "expected_min_score": 0.5,
+      "expected_reason_codes": [
+        "missing_active_subgoal"
+      ]
+    },
+    {
+      "perturbation_id": "drop-evidence-order-ensemble",
+      "scenario_id": "pilot_tool_order",
+      "context_system": "ledger_only",
+      "detector": "calibrated_ensemble",
+      "target_event_id": "order-decision",
+      "perturbation_kind": "drop_required_evidence",
+      "expected_min_score": 0.66,
+      "expected_reason_codes": [
+        "missing_required_evidence",
+        "weak_evidence_alignment"
+      ]
+    }
+  ]
+}

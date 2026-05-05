@@ -1,0 +1,35 @@
+{
+  "name": "validation_wave2_context_ablation",
+  "purpose": "Frozen validation ablation over the full context-system family under no intervention.",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_validation",
+  "manifest_stage": "selection",
+  "scenarios": [
+    "validation_procurement_audit_packet",
+    "validation_access_review_reactivation",
+    "validation_policy_supersession_credit",
+    "validation_exec_message_injection",
+    "validation_hr_case_packet",
+    "validation_device_wipe_request",
+    "validation_pricing_override_window",
+    "validation_billing_chat_escalation"
+  ],
+  "context_systems": [
+    "raw_transcript",
+    "summary_only",
+    "retrieval_only",
+    "ledger_only",
+    "ledger_retrieval",
+    "ledger_summary_retrieval"
+  ],
+  "detectors": [
+    "rule_based"
+  ],
+  "policies": [
+    "none"
+  ],
+  "notes": [
+    "Validation remains frozen and selection-only.",
+    "This manifest broadens the context comparison without introducing intervention tuning on a tuning-allowed split."
+  ]
+}

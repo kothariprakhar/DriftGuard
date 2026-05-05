@@ -1,0 +1,41 @@
+{
+  "name": "validation_wave2_intervention_selection",
+  "purpose": "Frozen validation selection over detector and intervention families across the full context-system family.",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_validation",
+  "manifest_stage": "selection",
+  "scenarios": [
+    "validation_procurement_audit_packet",
+    "validation_access_review_reactivation",
+    "validation_policy_supersession_credit",
+    "validation_exec_message_injection",
+    "validation_hr_case_packet",
+    "validation_device_wipe_request",
+    "validation_pricing_override_window",
+    "validation_billing_chat_escalation"
+  ],
+  "context_systems": [
+    "raw_transcript",
+    "summary_only",
+    "retrieval_only",
+    "ledger_only",
+    "ledger_retrieval",
+    "ledger_summary_retrieval"
+  ],
+  "detectors": [
+    "rule_based",
+    "calibrated_ensemble"
+  ],
+  "policies": [
+    "none",
+    "anchor_refresh",
+    "ledger_regeneration",
+    "rollback",
+    "safe_stop",
+    "adaptive"
+  ],
+  "notes": [
+    "This manifest stays on the frozen validation split and is intended for final local selection analysis.",
+    "It measures whether detector-triggered interventions improve weak baselines and whether ledger-centric systems still dominate under intervention."
+  ]
+}

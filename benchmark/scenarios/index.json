@@ -1,0 +1,220 @@
+{
+  "scenarios": [
+    {
+      "scenario_id": "pilot_evidence_brief",
+      "split": "pilot",
+      "family": "evidence_synthesis",
+      "path": "scenarios/pilot/pilot_evidence_brief.json"
+    },
+    {
+      "scenario_id": "pilot_vendor_triage",
+      "split": "pilot",
+      "family": "evidence_synthesis",
+      "path": "scenarios/pilot/pilot_vendor_triage.json"
+    },
+    {
+      "scenario_id": "pilot_tool_order",
+      "split": "pilot",
+      "family": "tool_state_workflow",
+      "path": "scenarios/pilot/pilot_tool_order.json"
+    },
+    {
+      "scenario_id": "pilot_lab_booking",
+      "split": "pilot",
+      "family": "tool_state_workflow",
+      "path": "scenarios/pilot/pilot_lab_booking.json"
+    },
+    {
+      "scenario_id": "pilot_travel_update",
+      "split": "pilot",
+      "family": "memory_update_conflict",
+      "path": "scenarios/pilot/pilot_travel_update.json"
+    },
+    {
+      "scenario_id": "pilot_profile_revision",
+      "split": "pilot",
+      "family": "memory_update_conflict",
+      "path": "scenarios/pilot/pilot_profile_revision.json"
+    },
+    {
+      "scenario_id": "pilot_email_injection",
+      "split": "pilot",
+      "family": "adversarial_untrusted_input",
+      "path": "scenarios/pilot/pilot_email_injection.json"
+    },
+    {
+      "scenario_id": "pilot_poisoned_note",
+      "split": "pilot",
+      "family": "adversarial_untrusted_input",
+      "path": "scenarios/pilot/pilot_poisoned_note.json"
+    },
+    {
+      "scenario_id": "dev_finance_variance_note",
+      "split": "dev",
+      "family": "evidence_synthesis",
+      "path": "scenarios/dev/dev_finance_variance_note.json"
+    },
+    {
+      "scenario_id": "dev_incident_root_cause_summary",
+      "split": "dev",
+      "family": "evidence_synthesis",
+      "path": "scenarios/dev/dev_incident_root_cause_summary.json"
+    },
+    {
+      "scenario_id": "dev_refund_after_chargeback",
+      "split": "dev",
+      "family": "tool_state_workflow",
+      "path": "scenarios/dev/dev_refund_after_chargeback.json"
+    },
+    {
+      "scenario_id": "dev_badge_reissue_approval",
+      "split": "dev",
+      "family": "tool_state_workflow",
+      "path": "scenarios/dev/dev_badge_reissue_approval.json"
+    },
+    {
+      "scenario_id": "dev_contract_redline_superseded",
+      "split": "dev",
+      "family": "memory_update_conflict",
+      "path": "scenarios/dev/dev_contract_redline_superseded.json"
+    },
+    {
+      "scenario_id": "dev_shipping_region_exception",
+      "split": "dev",
+      "family": "memory_update_conflict",
+      "path": "scenarios/dev/dev_shipping_region_exception.json"
+    },
+    {
+      "scenario_id": "dev_ticket_prompt_hijack",
+      "split": "dev",
+      "family": "adversarial_untrusted_input",
+      "path": "scenarios/dev/dev_ticket_prompt_hijack.json"
+    },
+    {
+      "scenario_id": "dev_retention_note_override",
+      "split": "dev",
+      "family": "adversarial_untrusted_input",
+      "path": "scenarios/dev/dev_retention_note_override.json"
+    },
+    {
+      "scenario_id": "dev_export_exception_signed_packet",
+      "split": "dev",
+      "family": "evidence_synthesis",
+      "path": "scenarios/dev/dev_export_exception_signed_packet.json"
+    },
+    {
+      "scenario_id": "dev_vendor_onboarding_compliance_hold",
+      "split": "dev",
+      "family": "tool_state_workflow",
+      "path": "scenarios/dev/dev_vendor_onboarding_compliance_hold.json"
+    },
+    {
+      "scenario_id": "dev_discount_exception_revoked",
+      "split": "dev",
+      "family": "memory_update_conflict",
+      "path": "scenarios/dev/dev_discount_exception_revoked.json"
+    },
+    {
+      "scenario_id": "dev_hr_case_close_injection",
+      "split": "dev",
+      "family": "adversarial_untrusted_input",
+      "path": "scenarios/dev/dev_hr_case_close_injection.json"
+    },
+    {
+      "scenario_id": "validation_procurement_audit_packet",
+      "split": "validation",
+      "family": "evidence_synthesis",
+      "path": "scenarios/validation/validation_procurement_audit_packet.json"
+    },
+    {
+      "scenario_id": "validation_access_review_reactivation",
+      "split": "validation",
+      "family": "tool_state_workflow",
+      "path": "scenarios/validation/validation_access_review_reactivation.json"
+    },
+    {
+      "scenario_id": "validation_policy_supersession_credit",
+      "split": "validation",
+      "family": "memory_update_conflict",
+      "path": "scenarios/validation/validation_policy_supersession_credit.json"
+    },
+    {
+      "scenario_id": "validation_exec_message_injection",
+      "split": "validation",
+      "family": "adversarial_untrusted_input",
+      "path": "scenarios/validation/validation_exec_message_injection.json"
+    },
+    {
+      "scenario_id": "validation_hr_case_packet",
+      "split": "validation",
+      "family": "evidence_synthesis",
+      "path": "scenarios/validation/validation_hr_case_packet.json"
+    },
+    {
+      "scenario_id": "validation_device_wipe_request",
+      "split": "validation",
+      "family": "tool_state_workflow",
+      "path": "scenarios/validation/validation_device_wipe_request.json"
+    },
+    {
+      "scenario_id": "validation_pricing_override_window",
+      "split": "validation",
+      "family": "memory_update_conflict",
+      "path": "scenarios/validation/validation_pricing_override_window.json"
+    },
+    {
+      "scenario_id": "validation_billing_chat_escalation",
+      "split": "validation",
+      "family": "adversarial_untrusted_input",
+      "path": "scenarios/validation/validation_billing_chat_escalation.json"
+    },
+    {
+      "scenario_id": "test_airworthiness_certificate_packet",
+      "split": "test",
+      "family": "evidence_synthesis",
+      "path": "scenarios/test/test_airworthiness_certificate_packet.json"
+    },
+    {
+      "scenario_id": "test_sanctions_clearance_packet",
+      "split": "test",
+      "family": "evidence_synthesis",
+      "path": "scenarios/test/test_sanctions_clearance_packet.json"
+    },
+    {
+      "scenario_id": "test_database_access_restore",
+      "split": "test",
+      "family": "tool_state_workflow",
+      "path": "scenarios/test/test_database_access_restore.json"
+    },
+    {
+      "scenario_id": "test_badge_reactivation_clearance_hold",
+      "split": "test",
+      "family": "tool_state_workflow",
+      "path": "scenarios/test/test_badge_reactivation_clearance_hold.json"
+    },
+    {
+      "scenario_id": "test_rebate_window_reinstatement",
+      "split": "test",
+      "family": "memory_update_conflict",
+      "path": "scenarios/test/test_rebate_window_reinstatement.json"
+    },
+    {
+      "scenario_id": "test_freight_surcharge_window_closed",
+      "split": "test",
+      "family": "memory_update_conflict",
+      "path": "scenarios/test/test_freight_surcharge_window_closed.json"
+    },
+    {
+      "scenario_id": "test_vendor_wire_change_injection",
+      "split": "test",
+      "family": "adversarial_untrusted_input",
+      "path": "scenarios/test/test_vendor_wire_change_injection.json"
+    },
+    {
+      "scenario_id": "test_payroll_redirect_injection",
+      "split": "test",
+      "family": "adversarial_untrusted_input",
+      "path": "scenarios/test/test_payroll_redirect_injection.json"
+    }
+  ]
+}

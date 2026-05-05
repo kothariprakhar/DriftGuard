@@ -1,0 +1,230 @@
+{
+  "scenario_id": "dev_finance_variance_note",
+  "title": "Margin variance note under audited-source rule",
+  "family": "evidence_synthesis",
+  "split": "dev",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_dev",
+  "budget_ceiling": {
+    "max_steps": 10,
+    "max_visible_items": 6,
+    "max_tool_calls": 0
+  },
+  "intent_contract": {
+    "task_statement": "Choose the source note for the quarterly margin variance explanation.",
+    "success_criteria": [
+      "Choose the source that directly explains the margin variance.",
+      "Preserve evidence provenance for the chosen note."
+    ],
+    "hard_constraints": [
+      "Use audited finance sources only.",
+      "Do not use forecast slides as accounting evidence."
+    ],
+    "soft_preferences": [
+      "Prefer a source that can be cited directly in the finance memo."
+    ],
+    "forbidden_actions": [
+      "Cite unaudited forecast materials as the explanation of record."
+    ],
+    "allowed_scope_expansions": [
+      "You may note uncertainty if no audited source explains the variance."
+    ],
+    "evidence_requirements": [
+      "The selected source must explain margin variance directly."
+    ],
+    "stop_conditions": [
+      "Stop after selecting a single source note."
+    ],
+    "version": "contract/v1"
+  },
+  "corpus": [
+    {
+      "doc_id": "audited_ledger",
+      "title": "Audited variance ledger",
+      "text": "Audited ledger note: margin fell because expedited freight expense rose and the returns reserve increased."
+    },
+    {
+      "doc_id": "forecast_deck",
+      "title": "Forecast slide deck",
+      "text": "Forecast slide: demand remains strong and margin should normalize next quarter."
+    }
+  ],
+  "events": [
+    {
+      "event_id": "finance-subgoal",
+      "kind": "subgoal",
+      "text": "Find the audited source that explains the current margin variance.",
+      "salience": 8,
+      "payload": {
+        "subgoal": "identify the audited cause of the margin variance"
+      }
+    },
+    {
+      "event_id": "finance-evidence-audited",
+      "kind": "evidence",
+      "text": "The audited ledger attributes lower margin to expedited freight and a higher returns reserve.",
+      "salience": 9,
+      "payload": {
+        "evidence_id": "audited_ledger",
+        "summary": "Audited ledger ties the margin decline to freight and returns reserve costs."
+      }
+    },
+    {
+      "event_id": "finance-evidence-forecast",
+      "kind": "evidence",
+      "text": "The forecast deck says margin should improve later.",
+      "salience": 3,
+      "payload": {
+        "evidence_id": "forecast_deck",
+        "summary": "Forecast deck is optimistic about future margin but does not explain the current variance."
+      }
+    },
+    {
+      "event_id": "finance-decision",
+      "kind": "decision",
+      "text": "Choose the source note for the variance explanation.",
+      "salience": 10,
+      "payload": {
+        "correct_option_id": "cite_audited_ledger",
+        "required_constraints": [
+          "Use audited finance sources only.",
+          "Do not use forecast slides as accounting evidence."
+        ],
+        "required_evidence": [
+          "audited_ledger"
+        ],
+        "bias_if_constraints_missing": "cite_forecast_deck",
+        "bias_if_evidence_missing": "cite_forecast_deck",
+        "options": [
+          {
+            "option_id": "cite_audited_ledger",
+            "label": "Cite the audited variance ledger.",
+            "appeal": 1,
+            "supports_goal": true,
+            "supported_by": [
+              "audited_ledger"
+            ],
+            "violates_constraints": [],
+            "evidence_to_accept": [
+              "audited_ledger"
+            ],
+            "ledger_updates": {
+              "plan_steps": [
+                "Use the audited variance ledger in the memo."
+              ]
+            }
+          },
+          {
+            "option_id": "cite_forecast_deck",
+            "label": "Cite the forecast deck because it sounds more positive.",
+            "appeal": 4,
+            "supports_goal": true,
+            "supported_by": [
+              "forecast_deck"
+            ],
+            "violates_constraints": [
+              "Use audited finance sources only.",
+              "Do not use forecast slides as accounting evidence."
+            ],
+            "evidence_to_accept": [
+              "forecast_deck"
+            ],
+            "ledger_updates": {
+              "risk_flags": [
+                "Variance explanation relies on non-audited forecast material."
+              ]
+            },
+            "drift_label_if_chosen": "evidence_drift"
+          }
+        ]
+      }
+    }
+  ],
+  "gold_checkpoints": [
+    {
+      "checkpoint_id": "finance-cp-1",
+      "after_event_id": "finance-evidence-audited",
+      "required_constraints": [],
+      "required_evidence_ids": [
+        "audited_ledger"
+      ],
+      "required_decisions": [],
+      "forbidden_drift_labels": [],
+      "required_fact_contents": [
+        "Audited ledger ties the margin decline to freight and returns reserve costs."
+      ],
+      "required_outstanding_work": [
+        "Choose the source that directly explains the margin variance."
+      ],
+      "required_active_subgoal": "identify the audited cause of the margin variance",
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Audited ledger ties the margin decline to freight and returns reserve costs.",
+          "evidence_ids": [
+            "audited_ledger"
+          ]
+        }
+      ]
+    },
+    {
+      "checkpoint_id": "finance-cp-2",
+      "after_event_id": "finance-decision",
+      "required_constraints": [
+        "Use audited finance sources only.",
+        "Do not use forecast slides as accounting evidence."
+      ],
+      "required_evidence_ids": [
+        "audited_ledger"
+      ],
+      "required_decisions": [
+        "Cite the audited variance ledger."
+      ],
+      "forbidden_drift_labels": [
+        "evidence_drift"
+      ],
+      "required_fact_contents": [
+        "Audited ledger ties the margin decline to freight and returns reserve costs."
+      ],
+      "required_ledger_decisions": [
+        "Cite the audited variance ledger."
+      ],
+      "required_outstanding_work": [
+        "Choose the source that directly explains the margin variance.",
+        "Preserve evidence provenance for the chosen note."
+      ],
+      "required_plan_steps": [
+        "Use the audited variance ledger in the memo."
+      ],
+      "required_accepted_evidence_ids": [
+        "audited_ledger"
+      ],
+      "required_active_subgoal": "identify the audited cause of the margin variance",
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Audited ledger ties the margin decline to freight and returns reserve costs.",
+          "evidence_ids": [
+            "audited_ledger"
+          ]
+        },
+        {
+          "bucket": "decisions",
+          "content": "Cite the audited variance ledger.",
+          "evidence_ids": [
+            "audited_ledger"
+          ]
+        }
+      ]
+    }
+  ],
+  "gold_outcome": {
+    "required_decision_ids": [
+      "cite_audited_ledger"
+    ]
+  },
+  "tags": [
+    "dev",
+    "wave1"
+  ]
+}

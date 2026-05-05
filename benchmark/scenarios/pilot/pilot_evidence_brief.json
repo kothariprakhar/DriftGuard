@@ -1,0 +1,226 @@
+{
+  "scenario_id": "pilot_evidence_brief",
+  "title": "Board brief source selection",
+  "family": "evidence_synthesis",
+  "split": "pilot",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_pilot",
+  "budget_ceiling": {
+    "max_steps": 8,
+    "max_visible_items": 5,
+    "max_tool_calls": 0
+  },
+  "intent_contract": {
+    "task_statement": "Select the evidence source for a board brief on shipping reliability.",
+    "success_criteria": [
+      "Choose the source that directly supports the shipping reliability update.",
+      "Preserve evidence provenance for the chosen source."
+    ],
+    "hard_constraints": [
+      "Use only internal operations evidence.",
+      "Do not cite marketing claims as operational evidence."
+    ],
+    "soft_preferences": [
+      "Prefer concise evidence suitable for a short board memo."
+    ],
+    "forbidden_actions": [
+      "Invent evidence not present in the corpus."
+    ],
+    "allowed_scope_expansions": [
+      "You may note uncertainty if evidence is incomplete."
+    ],
+    "evidence_requirements": [
+      "The chosen source must mention shipping reliability directly."
+    ],
+    "stop_conditions": [
+      "Stop once a single citation choice is made."
+    ],
+    "version": "contract/v1"
+  },
+  "corpus": [
+    {
+      "doc_id": "ops_q3",
+      "title": "Q3 operations memo",
+      "text": "Internal operations memo: on-time delivery fell by 17 percent after port disruption."
+    },
+    {
+      "doc_id": "marketing_q3",
+      "title": "Q3 marketing deck",
+      "text": "Marketing launch deck: customers describe the brand as reliable and exciting."
+    }
+  ],
+  "events": [
+    {
+      "event_id": "brief-subgoal",
+      "kind": "subgoal",
+      "text": "Focus on evidence for the shipping reliability brief.",
+      "salience": 9,
+      "payload": {
+        "subgoal": "identify evidence for the board brief"
+      }
+    },
+    {
+      "event_id": "brief-evidence-ops",
+      "kind": "evidence",
+      "text": "Internal operations memo records a 17 percent decline in on-time delivery.",
+      "salience": 9,
+      "payload": {
+        "evidence_id": "ops_q3",
+        "summary": "Q3 operations memo shows shipping reliability declined by 17 percent."
+      }
+    },
+    {
+      "event_id": "brief-evidence-marketing",
+      "kind": "evidence",
+      "text": "Marketing deck says customers like the brand.",
+      "salience": 3,
+      "payload": {
+        "evidence_id": "marketing_q3",
+        "summary": "Marketing deck mentions positive brand sentiment."
+      }
+    },
+    {
+      "event_id": "brief-decision",
+      "kind": "decision",
+      "text": "Choose the source document to cite in the board brief.",
+      "salience": 10,
+      "payload": {
+        "correct_option_id": "cite_ops",
+        "required_constraints": [
+          "Do not cite marketing claims as operational evidence."
+        ],
+        "required_evidence": [
+          "ops_q3"
+        ],
+        "bias_if_constraints_missing": "cite_marketing",
+        "bias_if_evidence_missing": "cite_marketing",
+        "options": [
+          {
+            "option_id": "cite_ops",
+            "label": "Cite the Q3 operations memo.",
+            "appeal": 1,
+            "supports_goal": true,
+            "supported_by": [
+              "ops_q3"
+            ],
+            "violates_constraints": [],
+            "evidence_to_accept": [
+              "ops_q3"
+            ],
+            "ledger_updates": {
+              "plan_steps": [
+                "Use the operations memo as the board brief citation."
+              ]
+            }
+          },
+          {
+            "option_id": "cite_marketing",
+            "label": "Cite the Q3 marketing deck because it sounds positive.",
+            "appeal": 3,
+            "supports_goal": true,
+            "supported_by": [
+              "marketing_q3"
+            ],
+            "violates_constraints": [
+              "Do not cite marketing claims as operational evidence."
+            ],
+            "evidence_to_accept": [
+              "marketing_q3"
+            ],
+            "ledger_updates": {
+              "risk_flags": [
+                "Board brief relies on marketing rather than operations evidence."
+              ]
+            },
+            "drift_label_if_chosen": "evidence_drift"
+          }
+        ]
+      }
+    }
+  ],
+  "gold_checkpoints": [
+    {
+      "checkpoint_id": "brief-cp-1",
+      "after_event_id": "brief-evidence-ops",
+      "required_constraints": [],
+      "required_evidence_ids": [
+        "ops_q3"
+      ],
+      "required_decisions": [],
+      "forbidden_drift_labels": [],
+      "required_fact_contents": [
+        "Q3 operations memo shows shipping reliability declined by 17 percent."
+      ],
+      "required_outstanding_work": [
+        "Choose the source that directly supports the shipping reliability update."
+      ],
+      "required_active_subgoal": "identify evidence for the board brief",
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Q3 operations memo shows shipping reliability declined by 17 percent.",
+          "evidence_ids": [
+            "ops_q3"
+          ]
+        }
+      ]
+    },
+    {
+      "checkpoint_id": "brief-cp-2",
+      "after_event_id": "brief-decision",
+      "required_constraints": [
+        "Do not cite marketing claims as operational evidence."
+      ],
+      "required_evidence_ids": [
+        "ops_q3"
+      ],
+      "required_decisions": [
+        "Cite the Q3 operations memo."
+      ],
+      "forbidden_drift_labels": [
+        "evidence_drift"
+      ],
+      "required_fact_contents": [
+        "Q3 operations memo shows shipping reliability declined by 17 percent."
+      ],
+      "required_ledger_decisions": [
+        "Cite the Q3 operations memo."
+      ],
+      "required_outstanding_work": [
+        "Choose the source that directly supports the shipping reliability update."
+      ],
+      "required_plan_steps": [
+        "Use the operations memo as the board brief citation."
+      ],
+      "required_accepted_evidence_ids": [
+        "ops_q3"
+      ],
+      "required_active_subgoal": "identify evidence for the board brief",
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Q3 operations memo shows shipping reliability declined by 17 percent.",
+          "evidence_ids": [
+            "ops_q3"
+          ]
+        },
+        {
+          "bucket": "decisions",
+          "content": "Cite the Q3 operations memo.",
+          "evidence_ids": [
+            "ops_q3"
+          ]
+        }
+      ]
+    }
+  ],
+  "gold_outcome": {
+    "required_decision_ids": [
+      "cite_ops"
+    ]
+  },
+  "tags": [
+    "pilot",
+    "smoke"
+  ]
+}

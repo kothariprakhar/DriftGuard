@@ -1,0 +1,32 @@
+{
+  "name": "pilot_live_backend_probe",
+  "purpose": "Small, low-cost backend-comparison slice for probing scripted versus live-model behavior on one pilot scenario per family.",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_pilot",
+  "manifest_stage": "baseline",
+  "scenarios": [
+    "pilot_evidence_brief",
+    "pilot_tool_order",
+    "pilot_profile_revision",
+    "pilot_email_injection"
+  ],
+  "context_systems": [
+    "raw_transcript",
+    "ledger_only"
+  ],
+  "detectors": [
+    "rule_based"
+  ],
+  "policies": [
+    "none"
+  ],
+  "agent_backends": [
+    "scripted_local",
+    "anthropic_messages",
+    "openai_compatible"
+  ],
+  "notes": [
+    "This slice is intentionally small so live-model probes stay cheap.",
+    "Use it to compare agent backends under identical scenarios, context systems, detector settings, and policies before scaling to broader frozen selection slices."
+  ]
+}

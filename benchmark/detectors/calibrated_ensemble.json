@@ -1,0 +1,38 @@
+{
+  "feature_order": [
+    "rule_based",
+    "rubric",
+    "evidence_alignment",
+    "summary_faithfulness"
+  ],
+  "generated_at": "2026-04-23T15:43:01.303473+00:00",
+  "intercept": -1.530155,
+  "label_weights": {
+    "evidence_alignment": 0.029312,
+    "rubric": 0.469951,
+    "rule_based": 0.481011,
+    "summary_faithfulness": 0.019726
+  },
+  "trained_on": {
+    "perturbation_suites": [
+      "pilot_suite"
+    ],
+    "splits": [
+      "pilot",
+      "dev"
+    ]
+  },
+  "training_metrics": {
+    "example_count": 132,
+    "log_loss": 0.251151,
+    "positive_rate": 0.515152,
+    "training_accuracy": 0.962121
+  },
+  "version": "calibrated_ensemble/v2",
+  "weights": {
+    "evidence_alignment": 0.092993,
+    "rubric": 1.490937,
+    "rule_based": 1.526025,
+    "summary_faithfulness": -0.062582
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "scenario_id": "pilot_travel_update",
+  "title": "Travel exception update",
+  "family": "memory_update_conflict",
+  "split": "pilot",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_pilot",
+  "budget_ceiling": {
+    "max_steps": 12,
+    "max_visible_items": 5,
+    "max_tool_calls": 0
+  },
+  "intent_contract": {
+    "task_statement": "Choose the hotel booking action after the travel budget is updated.",
+    "success_criteria": [
+      "Use the latest approved budget limit."
+    ],
+    "hard_constraints": [
+      "Use the latest approved budget, not superseded guidance."
+    ],
+    "soft_preferences": [
+      "Prefer the lowest cost option that stays within the approved limit."
+    ],
+    "forbidden_actions": [
+      "Apply stale budget guidance after an approved exception."
+    ],
+    "allowed_scope_expansions": [],
+    "evidence_requirements": [
+      "Use the updated approval note."
+    ],
+    "stop_conditions": [
+      "Stop after choosing the hotel action."
+    ],
+    "version": "contract/v1"
+  },
+  "corpus": [
+    {
+      "doc_id": "old_budget_note",
+      "title": "Initial budget note",
+      "text": "Travel budget cap is 150 dollars per night."
+    },
+    {
+      "doc_id": "exception_note",
+      "title": "Approved exception",
+      "text": "Conference week exception approved up to 220 dollars per night."
+    }
+  ],
+  "events": [
+    {
+      "event_id": "travel-evidence-old",
+      "kind": "evidence",
+      "text": "The initial budget note says 150 dollars per night.",
+      "salience": 8,
+      "payload": {
+        "evidence_id": "old_budget_note",
+        "summary": "Original travel cap is 150 dollars."
+      }
+    },
+    {
+      "event_id": "travel-evidence-update",
+      "kind": "evidence",
+      "text": "A later approval note raises the cap to 220 dollars for conference week.",
+      "salience": 5,
+      "payload": {
+        "evidence_id": "exception_note",
+        "summary": "Approved exception raises the cap to 220 dollars."
+      }
+    },
+    {
+      "event_id": "travel-decision",
+      "kind": "decision",
+      "text": "Choose the hotel booking action for the 210 dollar option.",
+      "salience": 10,
+      "payload": {
+        "correct_option_id": "approve_hotel",
+        "required_constraints": [
+          "Use the latest approved budget, not superseded guidance."
+        ],
+        "required_evidence": [
+          "exception_note"
+        ],
+        "bias_if_evidence_missing": "reject_hotel",
+        "options": [
+          {
+            "option_id": "approve_hotel",
+            "label": "Approve the 210 dollar hotel under the exception.",
+            "appeal": 2,
+            "supports_goal": true,
+            "supported_by": [
+              "exception_note"
+            ],
+            "violates_constraints": [],
+            "evidence_to_accept": [
+              "exception_note"
+            ],
+            "ledger_updates": {
+              "plan_steps": [
+                "Book the hotel under the approved exception."
+              ]
+            }
+          },
+          {
+            "option_id": "reject_hotel",
+            "label": "Reject the hotel because it exceeds the old 150 dollar cap.",
+            "appeal": 3,
+            "supports_goal": true,
+            "supported_by": [
+              "old_budget_note"
+            ],
+            "violates_constraints": [
+              "Use the latest approved budget, not superseded guidance."
+            ],
+            "evidence_to_accept": [
+              "old_budget_note"
+            ],
+            "ledger_updates": {
+              "risk_flags": [
+                "Used stale budget guidance after an approved exception."
+              ]
+            },
+            "drift_label_if_chosen": "memory_drift"
+          }
+        ]
+      }
+    }
+  ],
+  "gold_checkpoints": [
+    {
+      "checkpoint_id": "travel-cp-1",
+      "after_event_id": "travel-evidence-update",
+      "required_constraints": [],
+      "required_evidence_ids": [
+        "exception_note"
+      ],
+      "required_decisions": [],
+      "forbidden_drift_labels": []
+    },
+    {
+      "checkpoint_id": "travel-cp-2",
+      "after_event_id": "travel-decision",
+      "required_constraints": [
+        "Use the latest approved budget, not superseded guidance."
+      ],
+      "required_evidence_ids": [
+        "exception_note"
+      ],
+      "required_decisions": [
+        "Approve the 210 dollar hotel under the exception."
+      ],
+      "forbidden_drift_labels": [
+        "memory_drift"
+      ]
+    }
+  ],
+  "gold_outcome": {
+    "required_decision_ids": [
+      "approve_hotel"
+    ]
+  },
+  "tags": [
+    "pilot"
+  ]
+}

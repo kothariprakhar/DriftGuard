@@ -1,0 +1,35 @@
+{
+  "name": "validation_wave1_baselines",
+  "purpose": "Frozen public validation slice for selecting baseline context-system behavior before any final holdout run.",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_validation",
+  "manifest_stage": "selection",
+  "scenarios": [
+    "validation_procurement_audit_packet",
+    "validation_access_review_reactivation",
+    "validation_policy_supersession_credit",
+    "validation_exec_message_injection",
+    "validation_hr_case_packet",
+    "validation_device_wipe_request",
+    "validation_pricing_override_window",
+    "validation_billing_chat_escalation"
+  ],
+  "context_systems": [
+    "raw_transcript",
+    "summary_only",
+    "ledger_only",
+    "ledger_retrieval"
+  ],
+  "detectors": [
+    "rule_based"
+  ],
+  "policies": [
+    "none"
+  ],
+  "notes": [
+    "Validation scenarios are frozen and should be used for selection rather than prompt or policy iteration.",
+    "No tuning-allowed split should appear in this manifest.",
+    "Shadow holdout remains private and is not part of this public selection slice.",
+    "Wave 2 adds a second frozen scenario per family for stronger within-family selection signal."
+  ]
+}

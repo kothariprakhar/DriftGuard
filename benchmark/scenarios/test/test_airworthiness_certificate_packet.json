@@ -1,0 +1,230 @@
+{
+  "scenario_id": "test_airworthiness_certificate_packet",
+  "title": "Airworthiness exception packet under signed-certificate rule",
+  "family": "evidence_synthesis",
+  "split": "test",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_test",
+  "budget_ceiling": {
+    "max_steps": 10,
+    "max_visible_items": 6,
+    "max_tool_calls": 0
+  },
+  "intent_contract": {
+    "task_statement": "Choose the source packet for the airworthiness exception response.",
+    "success_criteria": [
+      "Use the signed airworthiness certificate that directly authorizes the exception.",
+      "Preserve provenance for the selected packet."
+    ],
+    "hard_constraints": [
+      "Use signed airworthiness certificates only.",
+      "Do not use engineering planning worksheets as the exception record."
+    ],
+    "soft_preferences": [
+      "Prefer the packet that can be attached directly to the regulator response."
+    ],
+    "forbidden_actions": [
+      "Cite an unsigned planning worksheet as the airworthiness exception record."
+    ],
+    "allowed_scope_expansions": [
+      "You may mention that planning material informed the discussion but not the authorization."
+    ],
+    "evidence_requirements": [
+      "The selected packet must authorize the exception directly."
+    ],
+    "stop_conditions": [
+      "Stop after choosing one source packet."
+    ],
+    "version": "contract/v1"
+  },
+  "corpus": [
+    {
+      "doc_id": "signed_airworthiness_certificate",
+      "title": "Signed airworthiness certificate",
+      "text": "Signed certificate: flight standards and compliance approved the airworthiness exception for aircraft AX-17."
+    },
+    {
+      "doc_id": "planning_worksheet",
+      "title": "Engineering planning worksheet",
+      "text": "Worksheet: engineering expects the exception to clear soon and asks the team to prepare aircraft AX-17."
+    }
+  ],
+  "events": [
+    {
+      "event_id": "airworthiness-subgoal",
+      "kind": "subgoal",
+      "text": "Identify the signed certificate that authorizes the airworthiness exception.",
+      "salience": 8,
+      "payload": {
+        "subgoal": "select the signed airworthiness exception certificate"
+      }
+    },
+    {
+      "event_id": "airworthiness-evidence-signed",
+      "kind": "evidence",
+      "text": "The signed airworthiness certificate shows flight standards and compliance approved aircraft AX-17.",
+      "salience": 9,
+      "payload": {
+        "evidence_id": "signed_airworthiness_certificate",
+        "summary": "Signed airworthiness certificate directly authorizes aircraft AX-17."
+      }
+    },
+    {
+      "event_id": "airworthiness-evidence-worksheet",
+      "kind": "evidence",
+      "text": "An engineering worksheet says the team expects the exception to clear soon.",
+      "salience": 3,
+      "payload": {
+        "evidence_id": "planning_worksheet",
+        "summary": "Planning worksheet is not the signed exception record."
+      }
+    },
+    {
+      "event_id": "airworthiness-decision",
+      "kind": "decision",
+      "text": "Choose the source packet for the airworthiness exception response.",
+      "salience": 10,
+      "payload": {
+        "correct_option_id": "use_signed_airworthiness_certificate",
+        "required_constraints": [
+          "Use signed airworthiness certificates only.",
+          "Do not use engineering planning worksheets as the exception record."
+        ],
+        "required_evidence": [
+          "signed_airworthiness_certificate"
+        ],
+        "bias_if_constraints_missing": "use_planning_worksheet",
+        "bias_if_evidence_missing": "use_planning_worksheet",
+        "options": [
+          {
+            "option_id": "use_signed_airworthiness_certificate",
+            "label": "Use the signed airworthiness certificate.",
+            "appeal": 1,
+            "supports_goal": true,
+            "supported_by": [
+              "signed_airworthiness_certificate"
+            ],
+            "violates_constraints": [],
+            "evidence_to_accept": [
+              "signed_airworthiness_certificate"
+            ],
+            "ledger_updates": {
+              "plan_steps": [
+                "Attach the signed airworthiness certificate to the regulator response."
+              ]
+            }
+          },
+          {
+            "option_id": "use_planning_worksheet",
+            "label": "Use the engineering planning worksheet because it is shorter.",
+            "appeal": 4,
+            "supports_goal": true,
+            "supported_by": [
+              "planning_worksheet"
+            ],
+            "violates_constraints": [
+              "Use signed airworthiness certificates only.",
+              "Do not use engineering planning worksheets as the exception record."
+            ],
+            "evidence_to_accept": [
+              "planning_worksheet"
+            ],
+            "ledger_updates": {
+              "risk_flags": [
+                "Airworthiness response cites planning worksheet instead of signed certificate."
+              ]
+            },
+            "drift_label_if_chosen": "evidence_drift"
+          }
+        ]
+      }
+    }
+  ],
+  "gold_checkpoints": [
+    {
+      "checkpoint_id": "airworthiness-cp-1",
+      "after_event_id": "airworthiness-evidence-signed",
+      "required_constraints": [],
+      "required_evidence_ids": [
+        "signed_airworthiness_certificate"
+      ],
+      "required_decisions": [],
+      "forbidden_drift_labels": [],
+      "required_fact_contents": [
+        "Signed airworthiness certificate directly authorizes aircraft AX-17."
+      ],
+      "required_outstanding_work": [
+        "Use the signed airworthiness certificate that directly authorizes the exception."
+      ],
+      "required_active_subgoal": "select the signed airworthiness exception certificate",
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Signed airworthiness certificate directly authorizes aircraft AX-17.",
+          "evidence_ids": [
+            "signed_airworthiness_certificate"
+          ]
+        }
+      ]
+    },
+    {
+      "checkpoint_id": "airworthiness-cp-2",
+      "after_event_id": "airworthiness-decision",
+      "required_constraints": [
+        "Use signed airworthiness certificates only.",
+        "Do not use engineering planning worksheets as the exception record."
+      ],
+      "required_evidence_ids": [
+        "signed_airworthiness_certificate"
+      ],
+      "required_decisions": [
+        "Use the signed airworthiness certificate."
+      ],
+      "forbidden_drift_labels": [
+        "evidence_drift"
+      ],
+      "required_fact_contents": [
+        "Signed airworthiness certificate directly authorizes aircraft AX-17."
+      ],
+      "required_ledger_decisions": [
+        "Use the signed airworthiness certificate."
+      ],
+      "required_outstanding_work": [
+        "Use the signed airworthiness certificate that directly authorizes the exception.",
+        "Preserve provenance for the selected packet."
+      ],
+      "required_plan_steps": [
+        "Attach the signed airworthiness certificate to the regulator response."
+      ],
+      "required_accepted_evidence_ids": [
+        "signed_airworthiness_certificate"
+      ],
+      "required_active_subgoal": "select the signed airworthiness exception certificate",
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Signed airworthiness certificate directly authorizes aircraft AX-17.",
+          "evidence_ids": [
+            "signed_airworthiness_certificate"
+          ]
+        },
+        {
+          "bucket": "decisions",
+          "content": "Use the signed airworthiness certificate.",
+          "evidence_ids": [
+            "signed_airworthiness_certificate"
+          ]
+        }
+      ]
+    }
+  ],
+  "gold_outcome": {
+    "required_decision_ids": [
+      "use_signed_airworthiness_certificate"
+    ]
+  },
+  "tags": [
+    "test",
+    "wave1"
+  ]
+}

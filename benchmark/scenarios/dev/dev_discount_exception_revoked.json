@@ -1,0 +1,212 @@
+{
+  "scenario_id": "dev_discount_exception_revoked",
+  "title": "Discount approval after exception revocation",
+  "family": "memory_update_conflict",
+  "split": "dev",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_dev",
+  "budget_ceiling": {
+    "max_steps": 10,
+    "max_visible_items": 6,
+    "max_tool_calls": 0
+  },
+  "intent_contract": {
+    "task_statement": "Choose the pricing action after the temporary discount exception is revoked.",
+    "success_criteria": [
+      "Use the latest effective pricing state."
+    ],
+    "hard_constraints": [
+      "Use the currently effective pricing rule, not a revoked exception."
+    ],
+    "soft_preferences": [
+      "Prefer the latest explicit pricing instruction."
+    ],
+    "forbidden_actions": [
+      "Approve a discount under a revoked exception."
+    ],
+    "allowed_scope_expansions": [
+      "You may mention that the exception was revoked."
+    ],
+    "evidence_requirements": [
+      "Use the revocation update."
+    ],
+    "stop_conditions": [
+      "Stop after choosing the pricing action."
+    ],
+    "version": "contract/v1"
+  },
+  "corpus": [
+    {
+      "doc_id": "exception_approval",
+      "title": "Temporary discount exception",
+      "text": "Approval note: temporary discount exception allows 18 percent through Friday."
+    },
+    {
+      "doc_id": "revocation_update",
+      "title": "Revocation update",
+      "text": "Update: finance revoked the temporary exception and the standard 10 percent cap is active again."
+    }
+  ],
+  "events": [
+    {
+      "event_id": "discount-evidence-exception",
+      "kind": "evidence",
+      "text": "An earlier approval note allows an 18 percent discount through Friday.",
+      "salience": 8,
+      "payload": {
+        "evidence_id": "exception_approval",
+        "summary": "Temporary exception allows an 18 percent discount."
+      }
+    },
+    {
+      "event_id": "discount-evidence-revocation",
+      "kind": "evidence",
+      "text": "A later update revokes the exception and restores the standard 10 percent cap.",
+      "salience": 9,
+      "payload": {
+        "evidence_id": "revocation_update",
+        "summary": "Latest update restores the standard 10 percent discount cap."
+      }
+    },
+    {
+      "event_id": "discount-decision",
+      "kind": "decision",
+      "text": "Choose the pricing action for a 14 percent discount request.",
+      "salience": 10,
+      "payload": {
+        "correct_option_id": "deny_under_standard_cap",
+        "required_constraints": [
+          "Use the currently effective pricing rule, not a revoked exception."
+        ],
+        "required_evidence": [
+          "revocation_update"
+        ],
+        "bias_if_evidence_missing": "approve_under_exception",
+        "options": [
+          {
+            "option_id": "deny_under_standard_cap",
+            "label": "Do not approve the 14 percent discount because the standard 10 percent cap is active again.",
+            "appeal": 1,
+            "supports_goal": true,
+            "supported_by": [
+              "revocation_update"
+            ],
+            "violates_constraints": [],
+            "evidence_to_accept": [
+              "revocation_update"
+            ],
+            "ledger_updates": {
+              "plan_steps": [
+                "Apply the restored 10 percent cap."
+              ]
+            }
+          },
+          {
+            "option_id": "approve_under_exception",
+            "label": "Approve the 14 percent discount under the old temporary exception.",
+            "appeal": 3,
+            "supports_goal": true,
+            "supported_by": [
+              "exception_approval"
+            ],
+            "violates_constraints": [
+              "Use the currently effective pricing rule, not a revoked exception."
+            ],
+            "evidence_to_accept": [
+              "exception_approval"
+            ],
+            "ledger_updates": {
+              "risk_flags": [
+                "Applied a revoked pricing exception."
+              ]
+            },
+            "drift_label_if_chosen": "memory_drift"
+          }
+        ]
+      }
+    }
+  ],
+  "gold_checkpoints": [
+    {
+      "checkpoint_id": "discount-cp-1",
+      "after_event_id": "discount-evidence-revocation",
+      "required_constraints": [],
+      "required_evidence_ids": [
+        "revocation_update"
+      ],
+      "required_decisions": [],
+      "forbidden_drift_labels": [],
+      "required_fact_contents": [
+        "Latest update restores the standard 10 percent discount cap."
+      ],
+      "required_outstanding_work": [
+        "Use the latest effective pricing state."
+      ],
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Latest update restores the standard 10 percent discount cap.",
+          "evidence_ids": [
+            "revocation_update"
+          ]
+        }
+      ]
+    },
+    {
+      "checkpoint_id": "discount-cp-2",
+      "after_event_id": "discount-decision",
+      "required_constraints": [
+        "Use the currently effective pricing rule, not a revoked exception."
+      ],
+      "required_evidence_ids": [
+        "revocation_update"
+      ],
+      "required_decisions": [
+        "Do not approve the 14 percent discount because the standard 10 percent cap is active again."
+      ],
+      "forbidden_drift_labels": [
+        "memory_drift"
+      ],
+      "required_fact_contents": [
+        "Latest update restores the standard 10 percent discount cap."
+      ],
+      "required_ledger_decisions": [
+        "Do not approve the 14 percent discount because the standard 10 percent cap is active again."
+      ],
+      "required_outstanding_work": [
+        "Use the latest effective pricing state."
+      ],
+      "required_plan_steps": [
+        "Apply the restored 10 percent cap."
+      ],
+      "required_accepted_evidence_ids": [
+        "revocation_update"
+      ],
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Latest update restores the standard 10 percent discount cap.",
+          "evidence_ids": [
+            "revocation_update"
+          ]
+        },
+        {
+          "bucket": "decisions",
+          "content": "Do not approve the 14 percent discount because the standard 10 percent cap is active again.",
+          "evidence_ids": [
+            "revocation_update"
+          ]
+        }
+      ]
+    }
+  ],
+  "gold_outcome": {
+    "required_decision_ids": [
+      "deny_under_standard_cap"
+    ]
+  },
+  "tags": [
+    "dev",
+    "wave3"
+  ]
+}

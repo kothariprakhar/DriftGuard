@@ -1,0 +1,34 @@
+{
+  "name": "dev_wave1_baselines",
+  "purpose": "Wave 1 development split for baseline context-system comparisons under the deterministic harness.",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_dev",
+  "manifest_stage": "development",
+  "scenarios": [
+    "dev_finance_variance_note",
+    "dev_incident_root_cause_summary",
+    "dev_refund_after_chargeback",
+    "dev_badge_reissue_approval",
+    "dev_contract_redline_superseded",
+    "dev_shipping_region_exception",
+    "dev_ticket_prompt_hijack",
+    "dev_retention_note_override"
+  ],
+  "context_systems": [
+    "raw_transcript",
+    "summary_only",
+    "ledger_only",
+    "ledger_retrieval"
+  ],
+  "detectors": [
+    "rule_based"
+  ],
+  "policies": [
+    "none"
+  ],
+  "notes": [
+    "Wave 1 focuses on deterministic baseline separation, not final system selection.",
+    "Pilot scenarios remain frozen and separate from dev tuning.",
+    "Ledger-centric systems should be compared against transcript and summary baselines under the same budget."
+  ]
+}

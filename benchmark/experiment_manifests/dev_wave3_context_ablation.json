@@ -1,0 +1,39 @@
+{
+  "name": "dev_wave3_context_ablation",
+  "purpose": "Expanded development context ablation over the 12-scenario dev split.",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_dev",
+  "manifest_stage": "development",
+  "scenarios": [
+    "dev_finance_variance_note",
+    "dev_incident_root_cause_summary",
+    "dev_export_exception_signed_packet",
+    "dev_refund_after_chargeback",
+    "dev_badge_reissue_approval",
+    "dev_vendor_onboarding_compliance_hold",
+    "dev_contract_redline_superseded",
+    "dev_shipping_region_exception",
+    "dev_discount_exception_revoked",
+    "dev_ticket_prompt_hijack",
+    "dev_retention_note_override",
+    "dev_hr_case_close_injection"
+  ],
+  "context_systems": [
+    "raw_transcript",
+    "summary_only",
+    "retrieval_only",
+    "ledger_only",
+    "ledger_retrieval",
+    "ledger_summary_retrieval"
+  ],
+  "detectors": [
+    "rule_based"
+  ],
+  "policies": [
+    "none"
+  ],
+  "notes": [
+    "Wave 3 expands the dev split to 12 scenarios while keeping the context ablation protocol fixed.",
+    "This manifest is the new development slice for broader benchmark coverage."
+  ]
+}

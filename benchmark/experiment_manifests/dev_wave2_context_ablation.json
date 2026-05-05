@@ -1,0 +1,35 @@
+{
+  "name": "dev_wave2_context_ablation",
+  "purpose": "Development ablation over the full context-system family under a fixed detector and no intervention.",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_dev",
+  "manifest_stage": "development",
+  "scenarios": [
+    "dev_finance_variance_note",
+    "dev_incident_root_cause_summary",
+    "dev_refund_after_chargeback",
+    "dev_badge_reissue_approval",
+    "dev_contract_redline_superseded",
+    "dev_shipping_region_exception",
+    "dev_ticket_prompt_hijack",
+    "dev_retention_note_override"
+  ],
+  "context_systems": [
+    "raw_transcript",
+    "summary_only",
+    "retrieval_only",
+    "ledger_only",
+    "ledger_retrieval",
+    "ledger_summary_retrieval"
+  ],
+  "detectors": [
+    "rule_based"
+  ],
+  "policies": [
+    "none"
+  ],
+  "notes": [
+    "Wave 2 broadens context ablations to retrieval-only and ledger-plus-summary hybrids.",
+    "The detector and policy stay fixed so the comparison isolates context engineering choices."
+  ]
+}

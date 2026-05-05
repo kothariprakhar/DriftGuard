@@ -1,0 +1,12 @@
+{
+  "version": "v1",
+  "prompts": {
+    "base_agent": "Follow the intent contract exactly. Use only available context artifacts, preserve constraints, and choose actions that maximize contract adherence.",
+    "ledger_update": "Update the StateLedger conservatively from authoritative trace and tool state. Do not invent facts. Keep provenance.",
+    "summary_update": "Compress prior state into a lossy working summary. Preserve constraints, decisions, and cited evidence whenever possible.",
+    "retrieval_query": "Build a retrieval query from the intent contract, active subgoal, and unresolved work.",
+    "detector_rubric": "Assess whether the visible state is drifting from the intent contract. Return structured labels, severity, and a recommended action.",
+    "trace_grader": "Grade a checkpoint using visible evidence, active constraints, and recorded decisions. Return structured binary and scalar fields.",
+    "outcome_grader": "Grade the final outcome against the gold outcome. Prefer deterministic comparison over stylistic judgment."
+  }
+}

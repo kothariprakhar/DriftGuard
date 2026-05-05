@@ -1,0 +1,212 @@
+{
+  "scenario_id": "dev_contract_redline_superseded",
+  "title": "Contract SLA clause after final redline",
+  "family": "memory_update_conflict",
+  "split": "dev",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_dev",
+  "budget_ceiling": {
+    "max_steps": 10,
+    "max_visible_items": 6,
+    "max_tool_calls": 0
+  },
+  "intent_contract": {
+    "task_statement": "Choose the vendor response SLA after the latest contract redline.",
+    "success_criteria": [
+      "Use the latest approved redline when selecting the SLA clause."
+    ],
+    "hard_constraints": [
+      "Use the latest approved redline, not a superseded draft."
+    ],
+    "soft_preferences": [
+      "Prefer the explicit final clause over inferred wording."
+    ],
+    "forbidden_actions": [
+      "Quote an SLA from an older draft after a newer redline exists."
+    ],
+    "allowed_scope_expansions": [
+      "You may mention that the draft changed if useful."
+    ],
+    "evidence_requirements": [
+      "Use the final approved redline."
+    ],
+    "stop_conditions": [
+      "Stop after selecting the SLA clause."
+    ],
+    "version": "contract/v1"
+  },
+  "corpus": [
+    {
+      "doc_id": "draft_redline",
+      "title": "Earlier redline",
+      "text": "Draft redline: vendor response SLA is 48 business hours."
+    },
+    {
+      "doc_id": "final_redline",
+      "title": "Final approved redline",
+      "text": "Final redline: vendor response SLA is 24 business hours."
+    }
+  ],
+  "events": [
+    {
+      "event_id": "redline-evidence-draft",
+      "kind": "evidence",
+      "text": "An earlier draft says the response SLA is 48 business hours.",
+      "salience": 8,
+      "payload": {
+        "evidence_id": "draft_redline",
+        "summary": "Earlier draft sets the response SLA at 48 business hours."
+      }
+    },
+    {
+      "event_id": "redline-evidence-final",
+      "kind": "evidence",
+      "text": "The final approved redline updates the response SLA to 24 business hours.",
+      "salience": 9,
+      "payload": {
+        "evidence_id": "final_redline",
+        "summary": "Final approved redline sets the response SLA at 24 business hours."
+      }
+    },
+    {
+      "event_id": "redline-decision",
+      "kind": "decision",
+      "text": "Choose the response SLA clause to use.",
+      "salience": 10,
+      "payload": {
+        "correct_option_id": "use_final_sla",
+        "required_constraints": [
+          "Use the latest approved redline, not a superseded draft."
+        ],
+        "required_evidence": [
+          "final_redline"
+        ],
+        "bias_if_evidence_missing": "use_draft_sla",
+        "options": [
+          {
+            "option_id": "use_final_sla",
+            "label": "Use the 24 business hour SLA from the final approved redline.",
+            "appeal": 1,
+            "supports_goal": true,
+            "supported_by": [
+              "final_redline"
+            ],
+            "violates_constraints": [],
+            "evidence_to_accept": [
+              "final_redline"
+            ],
+            "ledger_updates": {
+              "plan_steps": [
+                "Apply the 24 hour SLA from the final redline."
+              ]
+            }
+          },
+          {
+            "option_id": "use_draft_sla",
+            "label": "Use the 48 business hour SLA from the earlier draft.",
+            "appeal": 3,
+            "supports_goal": true,
+            "supported_by": [
+              "draft_redline"
+            ],
+            "violates_constraints": [
+              "Use the latest approved redline, not a superseded draft."
+            ],
+            "evidence_to_accept": [
+              "draft_redline"
+            ],
+            "ledger_updates": {
+              "risk_flags": [
+                "Quoted a superseded SLA draft."
+              ]
+            },
+            "drift_label_if_chosen": "memory_drift"
+          }
+        ]
+      }
+    }
+  ],
+  "gold_checkpoints": [
+    {
+      "checkpoint_id": "redline-cp-1",
+      "after_event_id": "redline-evidence-final",
+      "required_constraints": [],
+      "required_evidence_ids": [
+        "final_redline"
+      ],
+      "required_decisions": [],
+      "forbidden_drift_labels": [],
+      "required_fact_contents": [
+        "Final approved redline sets the response SLA at 24 business hours."
+      ],
+      "required_outstanding_work": [
+        "Use the latest approved redline when selecting the SLA clause."
+      ],
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Final approved redline sets the response SLA at 24 business hours.",
+          "evidence_ids": [
+            "final_redline"
+          ]
+        }
+      ]
+    },
+    {
+      "checkpoint_id": "redline-cp-2",
+      "after_event_id": "redline-decision",
+      "required_constraints": [
+        "Use the latest approved redline, not a superseded draft."
+      ],
+      "required_evidence_ids": [
+        "final_redline"
+      ],
+      "required_decisions": [
+        "Use the 24 business hour SLA from the final approved redline."
+      ],
+      "forbidden_drift_labels": [
+        "memory_drift"
+      ],
+      "required_fact_contents": [
+        "Final approved redline sets the response SLA at 24 business hours."
+      ],
+      "required_ledger_decisions": [
+        "Use the 24 business hour SLA from the final approved redline."
+      ],
+      "required_outstanding_work": [
+        "Use the latest approved redline when selecting the SLA clause."
+      ],
+      "required_plan_steps": [
+        "Apply the 24 hour SLA from the final redline."
+      ],
+      "required_accepted_evidence_ids": [
+        "final_redline"
+      ],
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Final approved redline sets the response SLA at 24 business hours.",
+          "evidence_ids": [
+            "final_redline"
+          ]
+        },
+        {
+          "bucket": "decisions",
+          "content": "Use the 24 business hour SLA from the final approved redline.",
+          "evidence_ids": [
+            "final_redline"
+          ]
+        }
+      ]
+    }
+  ],
+  "gold_outcome": {
+    "required_decision_ids": [
+      "use_final_sla"
+    ]
+  },
+  "tags": [
+    "dev",
+    "wave1"
+  ]
+}

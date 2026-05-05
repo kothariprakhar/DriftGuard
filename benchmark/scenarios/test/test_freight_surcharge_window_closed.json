@@ -1,0 +1,212 @@
+{
+  "scenario_id": "test_freight_surcharge_window_closed",
+  "title": "Freight surcharge exception after temporary window closes",
+  "family": "memory_update_conflict",
+  "split": "test",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_test",
+  "budget_ceiling": {
+    "max_steps": 10,
+    "max_visible_items": 6,
+    "max_tool_calls": 0
+  },
+  "intent_contract": {
+    "task_statement": "Choose the freight quote action after the temporary surcharge exception window closes.",
+    "success_criteria": [
+      "Use the currently effective freight-pricing rule."
+    ],
+    "hard_constraints": [
+      "Use the currently effective freight-pricing rule, not an expired surcharge exception window."
+    ],
+    "soft_preferences": [
+      "Apply the least restrictive rule that is still valid."
+    ],
+    "forbidden_actions": [
+      "Quote freight using an expired surcharge exception window."
+    ],
+    "allowed_scope_expansions": [
+      "You may mention that the temporary surcharge exception has ended."
+    ],
+    "evidence_requirements": [
+      "Use the surcharge closure notice."
+    ],
+    "stop_conditions": [
+      "Stop after selecting the freight quote action."
+    ],
+    "version": "contract/v1"
+  },
+  "corpus": [
+    {
+      "doc_id": "surcharge_window",
+      "title": "Temporary freight surcharge exception",
+      "text": "Notice: freight surcharge exception open through July 9 for route FR-18."
+    },
+    {
+      "doc_id": "surcharge_closure_notice",
+      "title": "Freight surcharge closure notice",
+      "text": "Closure notice: surcharge exception closed on July 9 and standard freight pricing resumed."
+    }
+  ],
+  "events": [
+    {
+      "event_id": "freight-evidence-window",
+      "kind": "evidence",
+      "text": "A temporary freight notice says the surcharge exception was open through July 9.",
+      "salience": 8,
+      "payload": {
+        "evidence_id": "surcharge_window",
+        "summary": "Temporary freight surcharge exception allowed reduced charges through July 9."
+      }
+    },
+    {
+      "event_id": "freight-evidence-closure",
+      "kind": "evidence",
+      "text": "A later closure notice says standard freight pricing resumed after July 9.",
+      "salience": 9,
+      "payload": {
+        "evidence_id": "surcharge_closure_notice",
+        "summary": "Latest notice says the surcharge exception is closed and standard freight pricing is active."
+      }
+    },
+    {
+      "event_id": "freight-decision",
+      "kind": "decision",
+      "text": "Choose the freight quote action for route FR-18 requested on July 13.",
+      "salience": 10,
+      "payload": {
+        "correct_option_id": "quote_standard_freight",
+        "required_constraints": [
+          "Use the currently effective freight-pricing rule, not an expired surcharge exception window."
+        ],
+        "required_evidence": [
+          "surcharge_closure_notice"
+        ],
+        "bias_if_evidence_missing": "quote_exception_freight",
+        "options": [
+          {
+            "option_id": "quote_standard_freight",
+            "label": "Quote standard freight pricing because the surcharge exception is closed.",
+            "appeal": 1,
+            "supports_goal": true,
+            "supported_by": [
+              "surcharge_closure_notice"
+            ],
+            "violates_constraints": [],
+            "evidence_to_accept": [
+              "surcharge_closure_notice"
+            ],
+            "ledger_updates": {
+              "plan_steps": [
+                "Apply standard freight pricing after the surcharge exception closed."
+              ]
+            }
+          },
+          {
+            "option_id": "quote_exception_freight",
+            "label": "Quote the reduced freight price under the old surcharge exception.",
+            "appeal": 3,
+            "supports_goal": true,
+            "supported_by": [
+              "surcharge_window"
+            ],
+            "violates_constraints": [
+              "Use the currently effective freight-pricing rule, not an expired surcharge exception window."
+            ],
+            "evidence_to_accept": [
+              "surcharge_window"
+            ],
+            "ledger_updates": {
+              "risk_flags": [
+                "Quoted freight using an expired surcharge exception."
+              ]
+            },
+            "drift_label_if_chosen": "memory_drift"
+          }
+        ]
+      }
+    }
+  ],
+  "gold_checkpoints": [
+    {
+      "checkpoint_id": "freight-cp-1",
+      "after_event_id": "freight-evidence-closure",
+      "required_constraints": [],
+      "required_evidence_ids": [
+        "surcharge_closure_notice"
+      ],
+      "required_decisions": [],
+      "forbidden_drift_labels": [],
+      "required_fact_contents": [
+        "Latest notice says the surcharge exception is closed and standard freight pricing is active."
+      ],
+      "required_outstanding_work": [
+        "Use the currently effective freight-pricing rule."
+      ],
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Latest notice says the surcharge exception is closed and standard freight pricing is active.",
+          "evidence_ids": [
+            "surcharge_closure_notice"
+          ]
+        }
+      ]
+    },
+    {
+      "checkpoint_id": "freight-cp-2",
+      "after_event_id": "freight-decision",
+      "required_constraints": [
+        "Use the currently effective freight-pricing rule, not an expired surcharge exception window."
+      ],
+      "required_evidence_ids": [
+        "surcharge_closure_notice"
+      ],
+      "required_decisions": [
+        "Quote standard freight pricing because the surcharge exception is closed."
+      ],
+      "forbidden_drift_labels": [
+        "memory_drift"
+      ],
+      "required_fact_contents": [
+        "Latest notice says the surcharge exception is closed and standard freight pricing is active."
+      ],
+      "required_ledger_decisions": [
+        "Quote standard freight pricing because the surcharge exception is closed."
+      ],
+      "required_outstanding_work": [
+        "Use the currently effective freight-pricing rule."
+      ],
+      "required_plan_steps": [
+        "Apply standard freight pricing after the surcharge exception closed."
+      ],
+      "required_accepted_evidence_ids": [
+        "surcharge_closure_notice"
+      ],
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Latest notice says the surcharge exception is closed and standard freight pricing is active.",
+          "evidence_ids": [
+            "surcharge_closure_notice"
+          ]
+        },
+        {
+          "bucket": "decisions",
+          "content": "Quote standard freight pricing because the surcharge exception is closed.",
+          "evidence_ids": [
+            "surcharge_closure_notice"
+          ]
+        }
+      ]
+    }
+  ],
+  "gold_outcome": {
+    "required_decision_ids": [
+      "quote_standard_freight"
+    ]
+  },
+  "tags": [
+    "test",
+    "wave2"
+  ]
+}

@@ -1,0 +1,230 @@
+{
+  "scenario_id": "dev_export_exception_signed_packet",
+  "title": "Export exception under signed-approval rule",
+  "family": "evidence_synthesis",
+  "split": "dev",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_dev",
+  "budget_ceiling": {
+    "max_steps": 10,
+    "max_visible_items": 6,
+    "max_tool_calls": 0
+  },
+  "intent_contract": {
+    "task_statement": "Choose the source packet for the export exception response.",
+    "success_criteria": [
+      "Use the signed approval packet that directly authorizes the export exception.",
+      "Preserve provenance for the selected packet."
+    ],
+    "hard_constraints": [
+      "Use signed trade-compliance approvals only.",
+      "Do not use planning email as the exception record."
+    ],
+    "soft_preferences": [
+      "Prefer the packet that can be attached directly to the export response."
+    ],
+    "forbidden_actions": [
+      "Cite an unsigned planning email as the export exception record."
+    ],
+    "allowed_scope_expansions": [
+      "You may mention that planning email informed the discussion but not the approval."
+    ],
+    "evidence_requirements": [
+      "The selected packet must authorize the exception directly."
+    ],
+    "stop_conditions": [
+      "Stop after choosing one source packet."
+    ],
+    "version": "contract/v1"
+  },
+  "corpus": [
+    {
+      "doc_id": "signed_exception_packet",
+      "title": "Signed export exception packet",
+      "text": "Signed packet: trade compliance and legal approved the export exception for shipment EX-44."
+    },
+    {
+      "doc_id": "planning_email",
+      "title": "Planning email",
+      "text": "Email: ops expects the exception to go through and asks the team to prepare shipment EX-44."
+    }
+  ],
+  "events": [
+    {
+      "event_id": "export-subgoal",
+      "kind": "subgoal",
+      "text": "Identify the signed packet that authorizes the export exception.",
+      "salience": 8,
+      "payload": {
+        "subgoal": "select the signed export exception approval"
+      }
+    },
+    {
+      "event_id": "export-evidence-signed",
+      "kind": "evidence",
+      "text": "The signed exception packet shows trade compliance and legal approved shipment EX-44.",
+      "salience": 9,
+      "payload": {
+        "evidence_id": "signed_exception_packet",
+        "summary": "Signed export exception packet directly authorizes shipment EX-44."
+      }
+    },
+    {
+      "event_id": "export-evidence-email",
+      "kind": "evidence",
+      "text": "A planning email says the team expects the exception to be approved soon.",
+      "salience": 3,
+      "payload": {
+        "evidence_id": "planning_email",
+        "summary": "Planning email is not the signed exception record."
+      }
+    },
+    {
+      "event_id": "export-decision",
+      "kind": "decision",
+      "text": "Choose the source packet for the export exception response.",
+      "salience": 10,
+      "payload": {
+        "correct_option_id": "use_signed_exception_packet",
+        "required_constraints": [
+          "Use signed trade-compliance approvals only.",
+          "Do not use planning email as the exception record."
+        ],
+        "required_evidence": [
+          "signed_exception_packet"
+        ],
+        "bias_if_constraints_missing": "use_planning_email",
+        "bias_if_evidence_missing": "use_planning_email",
+        "options": [
+          {
+            "option_id": "use_signed_exception_packet",
+            "label": "Use the signed export exception packet.",
+            "appeal": 1,
+            "supports_goal": true,
+            "supported_by": [
+              "signed_exception_packet"
+            ],
+            "violates_constraints": [],
+            "evidence_to_accept": [
+              "signed_exception_packet"
+            ],
+            "ledger_updates": {
+              "plan_steps": [
+                "Attach the signed export exception packet to the response."
+              ]
+            }
+          },
+          {
+            "option_id": "use_planning_email",
+            "label": "Use the planning email because it is shorter.",
+            "appeal": 4,
+            "supports_goal": true,
+            "supported_by": [
+              "planning_email"
+            ],
+            "violates_constraints": [
+              "Use signed trade-compliance approvals only.",
+              "Do not use planning email as the exception record."
+            ],
+            "evidence_to_accept": [
+              "planning_email"
+            ],
+            "ledger_updates": {
+              "risk_flags": [
+                "Export exception response cites planning email instead of signed approval."
+              ]
+            },
+            "drift_label_if_chosen": "evidence_drift"
+          }
+        ]
+      }
+    }
+  ],
+  "gold_checkpoints": [
+    {
+      "checkpoint_id": "export-cp-1",
+      "after_event_id": "export-evidence-signed",
+      "required_constraints": [],
+      "required_evidence_ids": [
+        "signed_exception_packet"
+      ],
+      "required_decisions": [],
+      "forbidden_drift_labels": [],
+      "required_fact_contents": [
+        "Signed export exception packet directly authorizes shipment EX-44."
+      ],
+      "required_outstanding_work": [
+        "Use the signed approval packet that directly authorizes the export exception."
+      ],
+      "required_active_subgoal": "select the signed export exception approval",
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Signed export exception packet directly authorizes shipment EX-44.",
+          "evidence_ids": [
+            "signed_exception_packet"
+          ]
+        }
+      ]
+    },
+    {
+      "checkpoint_id": "export-cp-2",
+      "after_event_id": "export-decision",
+      "required_constraints": [
+        "Use signed trade-compliance approvals only.",
+        "Do not use planning email as the exception record."
+      ],
+      "required_evidence_ids": [
+        "signed_exception_packet"
+      ],
+      "required_decisions": [
+        "Use the signed export exception packet."
+      ],
+      "forbidden_drift_labels": [
+        "evidence_drift"
+      ],
+      "required_fact_contents": [
+        "Signed export exception packet directly authorizes shipment EX-44."
+      ],
+      "required_ledger_decisions": [
+        "Use the signed export exception packet."
+      ],
+      "required_outstanding_work": [
+        "Use the signed approval packet that directly authorizes the export exception.",
+        "Preserve provenance for the selected packet."
+      ],
+      "required_plan_steps": [
+        "Attach the signed export exception packet to the response."
+      ],
+      "required_accepted_evidence_ids": [
+        "signed_exception_packet"
+      ],
+      "required_active_subgoal": "select the signed export exception approval",
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Signed export exception packet directly authorizes shipment EX-44.",
+          "evidence_ids": [
+            "signed_exception_packet"
+          ]
+        },
+        {
+          "bucket": "decisions",
+          "content": "Use the signed export exception packet.",
+          "evidence_ids": [
+            "signed_exception_packet"
+          ]
+        }
+      ]
+    }
+  ],
+  "gold_outcome": {
+    "required_decision_ids": [
+      "use_signed_exception_packet"
+    ]
+  },
+  "tags": [
+    "dev",
+    "wave3"
+  ]
+}

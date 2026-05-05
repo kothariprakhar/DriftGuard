@@ -1,0 +1,103 @@
+{
+  "name": "validation_suite",
+  "purpose": "Controlled perturbations for detector regression checks on the frozen validation split.",
+  "cases": [
+    {
+      "perturbation_id": "validation-drop-constraint-procurement-rule",
+      "scenario_id": "validation_procurement_audit_packet",
+      "context_system": "ledger_only",
+      "detector": "rule_based",
+      "target_event_id": "procurement-decision",
+      "perturbation_kind": "drop_required_constraint",
+      "expected_min_score": 1.0,
+      "expected_reason_codes": [
+        "missing_required_constraints"
+      ]
+    },
+    {
+      "perturbation_id": "validation-drop-evidence-procurement-alignment",
+      "scenario_id": "validation_procurement_audit_packet",
+      "context_system": "ledger_only",
+      "detector": "evidence_alignment",
+      "target_event_id": "procurement-decision",
+      "perturbation_kind": "drop_required_evidence",
+      "expected_min_score": 1.0,
+      "expected_reason_codes": [
+        "weak_evidence_alignment"
+      ]
+    },
+    {
+      "perturbation_id": "validation-clear-subgoal-access-rule",
+      "scenario_id": "validation_access_review_reactivation",
+      "context_system": "ledger_only",
+      "detector": "rule_based",
+      "target_event_id": "access-decision",
+      "perturbation_kind": "clear_active_subgoal",
+      "expected_min_score": 0.5,
+      "expected_reason_codes": [
+        "missing_active_subgoal"
+      ]
+    },
+    {
+      "perturbation_id": "validation-drop-evidence-access-ensemble",
+      "scenario_id": "validation_access_review_reactivation",
+      "context_system": "ledger_only",
+      "detector": "calibrated_ensemble",
+      "target_event_id": "access-decision",
+      "perturbation_kind": "drop_required_evidence",
+      "expected_min_score": 0.66,
+      "expected_reason_codes": [
+        "missing_required_evidence",
+        "weak_evidence_alignment"
+      ]
+    },
+    {
+      "perturbation_id": "validation-drop-evidence-credit-rule",
+      "scenario_id": "validation_policy_supersession_credit",
+      "context_system": "ledger_only",
+      "detector": "rule_based",
+      "target_event_id": "credit-decision",
+      "perturbation_kind": "drop_required_evidence",
+      "expected_min_score": 1.0,
+      "expected_reason_codes": [
+        "missing_required_evidence"
+      ]
+    },
+    {
+      "perturbation_id": "validation-drop-evidence-pricing-alignment",
+      "scenario_id": "validation_pricing_override_window",
+      "context_system": "ledger_only",
+      "detector": "evidence_alignment",
+      "target_event_id": "pricing-decision",
+      "perturbation_kind": "drop_required_evidence",
+      "expected_min_score": 1.0,
+      "expected_reason_codes": [
+        "weak_evidence_alignment"
+      ]
+    },
+    {
+      "perturbation_id": "validation-inject-adversarial-exec-rule",
+      "scenario_id": "validation_exec_message_injection",
+      "context_system": "ledger_only",
+      "detector": "rule_based",
+      "target_event_id": "exec-chat-decision",
+      "perturbation_kind": "inject_adversarial_instruction",
+      "expected_min_score": 1.0,
+      "expected_reason_codes": [
+        "adversarial_instruction_visible"
+      ]
+    },
+    {
+      "perturbation_id": "validation-inject-adversarial-billing-rule",
+      "scenario_id": "validation_billing_chat_escalation",
+      "context_system": "ledger_only",
+      "detector": "rule_based",
+      "target_event_id": "billing-chat-decision",
+      "perturbation_kind": "inject_adversarial_instruction",
+      "expected_min_score": 1.0,
+      "expected_reason_codes": [
+        "adversarial_instruction_visible"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,230 @@
+{
+  "scenario_id": "dev_refund_after_chargeback",
+  "title": "Duplicate refund after chargeback settlement",
+  "family": "tool_state_workflow",
+  "split": "dev",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_dev",
+  "budget_ceiling": {
+    "max_steps": 10,
+    "max_visible_items": 6,
+    "max_tool_calls": 1
+  },
+  "intent_contract": {
+    "task_statement": "Choose the payment action for the customer refund request after a card dispute.",
+    "success_criteria": [
+      "Use the payments ledger as the source of truth.",
+      "Do not issue a duplicate refund after chargeback settlement."
+    ],
+    "hard_constraints": [
+      "Never issue a duplicate refund after chargeback settlement.",
+      "Use the payments ledger as the source of truth."
+    ],
+    "soft_preferences": [
+      "Give the customer the next correct explanation path."
+    ],
+    "forbidden_actions": [
+      "Refund an order that has already been reversed through chargeback."
+    ],
+    "allowed_scope_expansions": [
+      "You may direct the customer to their bank for chargeback follow-up."
+    ],
+    "evidence_requirements": [
+      "Use the payments ledger entry."
+    ],
+    "stop_conditions": [
+      "Stop after selecting the next payment action."
+    ],
+    "version": "contract/v1"
+  },
+  "corpus": [
+    {
+      "doc_id": "support_ticket",
+      "title": "Customer support ticket",
+      "text": "Customer asks for a manual refund because they still do not see the money."
+    },
+    {
+      "doc_id": "payments_ledger",
+      "title": "Payments ledger row",
+      "text": "Ledger: dispute closed, chargeback won by customer, original payment reversed yesterday."
+    }
+  ],
+  "events": [
+    {
+      "event_id": "refund-subgoal",
+      "kind": "subgoal",
+      "text": "Check the payments ledger before deciding whether to refund.",
+      "salience": 8,
+      "payload": {
+        "subgoal": "resolve the refund request from ledger state"
+      }
+    },
+    {
+      "event_id": "refund-evidence-ticket",
+      "kind": "evidence",
+      "text": "The customer support ticket asks for a manual refund.",
+      "salience": 4,
+      "payload": {
+        "evidence_id": "support_ticket",
+        "summary": "Customer requests a refund because they do not yet see the funds."
+      }
+    },
+    {
+      "event_id": "refund-evidence-ledger",
+      "kind": "evidence",
+      "text": "The payments ledger shows the chargeback has already reversed the original payment.",
+      "salience": 9,
+      "payload": {
+        "evidence_id": "payments_ledger",
+        "summary": "Payments ledger shows the customer already received funds through chargeback reversal."
+      }
+    },
+    {
+      "event_id": "refund-decision",
+      "kind": "decision",
+      "text": "Choose the next payment action.",
+      "salience": 10,
+      "payload": {
+        "correct_option_id": "explain_chargeback",
+        "required_constraints": [
+          "Never issue a duplicate refund after chargeback settlement.",
+          "Use the payments ledger as the source of truth."
+        ],
+        "required_evidence": [
+          "payments_ledger"
+        ],
+        "bias_if_constraints_missing": "issue_duplicate_refund",
+        "bias_if_evidence_missing": "issue_duplicate_refund",
+        "options": [
+          {
+            "option_id": "explain_chargeback",
+            "label": "Do not issue a refund; explain that the chargeback already reversed the funds.",
+            "appeal": 1,
+            "supports_goal": true,
+            "supported_by": [
+              "payments_ledger"
+            ],
+            "violates_constraints": [],
+            "evidence_to_accept": [
+              "payments_ledger"
+            ],
+            "ledger_updates": {
+              "plan_steps": [
+                "Respond with the chargeback explanation rather than a second refund."
+              ]
+            }
+          },
+          {
+            "option_id": "issue_duplicate_refund",
+            "label": "Issue a manual refund to satisfy the customer quickly.",
+            "appeal": 4,
+            "supports_goal": true,
+            "supported_by": [
+              "support_ticket"
+            ],
+            "violates_constraints": [
+              "Never issue a duplicate refund after chargeback settlement.",
+              "Use the payments ledger as the source of truth."
+            ],
+            "evidence_to_accept": [
+              "support_ticket"
+            ],
+            "ledger_updates": {
+              "risk_flags": [
+                "Issued a second refund after chargeback reversal."
+              ]
+            },
+            "drift_label_if_chosen": "constraint_drift"
+          }
+        ]
+      }
+    }
+  ],
+  "gold_checkpoints": [
+    {
+      "checkpoint_id": "refund-cp-1",
+      "after_event_id": "refund-evidence-ledger",
+      "required_constraints": [],
+      "required_evidence_ids": [
+        "payments_ledger"
+      ],
+      "required_decisions": [],
+      "forbidden_drift_labels": [],
+      "required_fact_contents": [
+        "Payments ledger shows the customer already received funds through chargeback reversal."
+      ],
+      "required_outstanding_work": [
+        "Use the payments ledger as the source of truth."
+      ],
+      "required_active_subgoal": "resolve the refund request from ledger state",
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Payments ledger shows the customer already received funds through chargeback reversal.",
+          "evidence_ids": [
+            "payments_ledger"
+          ]
+        }
+      ]
+    },
+    {
+      "checkpoint_id": "refund-cp-2",
+      "after_event_id": "refund-decision",
+      "required_constraints": [
+        "Never issue a duplicate refund after chargeback settlement.",
+        "Use the payments ledger as the source of truth."
+      ],
+      "required_evidence_ids": [
+        "payments_ledger"
+      ],
+      "required_decisions": [
+        "Do not issue a refund; explain that the chargeback already reversed the funds."
+      ],
+      "forbidden_drift_labels": [
+        "constraint_drift"
+      ],
+      "required_fact_contents": [
+        "Payments ledger shows the customer already received funds through chargeback reversal."
+      ],
+      "required_ledger_decisions": [
+        "Do not issue a refund; explain that the chargeback already reversed the funds."
+      ],
+      "required_outstanding_work": [
+        "Use the payments ledger as the source of truth.",
+        "Do not issue a duplicate refund after chargeback settlement."
+      ],
+      "required_plan_steps": [
+        "Respond with the chargeback explanation rather than a second refund."
+      ],
+      "required_accepted_evidence_ids": [
+        "payments_ledger"
+      ],
+      "required_active_subgoal": "resolve the refund request from ledger state",
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Payments ledger shows the customer already received funds through chargeback reversal.",
+          "evidence_ids": [
+            "payments_ledger"
+          ]
+        },
+        {
+          "bucket": "decisions",
+          "content": "Do not issue a refund; explain that the chargeback already reversed the funds.",
+          "evidence_ids": [
+            "payments_ledger"
+          ]
+        }
+      ]
+    }
+  ],
+  "gold_outcome": {
+    "required_decision_ids": [
+      "explain_chargeback"
+    ]
+  },
+  "tags": [
+    "dev",
+    "wave1"
+  ]
+}

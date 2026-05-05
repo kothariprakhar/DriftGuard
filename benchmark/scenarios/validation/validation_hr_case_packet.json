@@ -1,0 +1,230 @@
+{
+  "scenario_id": "validation_hr_case_packet",
+  "title": "HR case packet under signed-record rule",
+  "family": "evidence_synthesis",
+  "split": "validation",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_validation",
+  "budget_ceiling": {
+    "max_steps": 10,
+    "max_visible_items": 6,
+    "max_tool_calls": 0
+  },
+  "intent_contract": {
+    "task_statement": "Choose the source packet for the HR case review summary.",
+    "success_criteria": [
+      "Use the signed HR case record that directly supports the review summary.",
+      "Preserve provenance for the selected packet."
+    ],
+    "hard_constraints": [
+      "Use signed HR case records only.",
+      "Do not use manager prep notes as the official case source."
+    ],
+    "soft_preferences": [
+      "Prefer the packet that can be attached directly to the review memo."
+    ],
+    "forbidden_actions": [
+      "Use an unsigned prep note as the official HR case record."
+    ],
+    "allowed_scope_expansions": [
+      "You may mention that prep notes informed the discussion but not the official summary."
+    ],
+    "evidence_requirements": [
+      "The selected packet must record the confirmed case outcome directly."
+    ],
+    "stop_conditions": [
+      "Stop after choosing one source packet."
+    ],
+    "version": "contract/v1"
+  },
+  "corpus": [
+    {
+      "doc_id": "signed_hr_case",
+      "title": "Signed HR case record",
+      "text": "Signed HR case record: investigation closed with documented coaching outcome on April 4."
+    },
+    {
+      "doc_id": "prep_note",
+      "title": "Manager prep note",
+      "text": "Prep note: likely coaching outcome, waiting for HR signature."
+    }
+  ],
+  "events": [
+    {
+      "event_id": "hr-subgoal",
+      "kind": "subgoal",
+      "text": "Identify the signed HR case record for the review summary.",
+      "salience": 8,
+      "payload": {
+        "subgoal": "select the signed HR case source for the summary"
+      }
+    },
+    {
+      "event_id": "hr-evidence-signed",
+      "kind": "evidence",
+      "text": "The signed HR case record documents that the case closed with a coaching outcome.",
+      "salience": 9,
+      "payload": {
+        "evidence_id": "signed_hr_case",
+        "summary": "Signed HR case record confirms the coaching outcome."
+      }
+    },
+    {
+      "event_id": "hr-evidence-note",
+      "kind": "evidence",
+      "text": "A manager prep note mentions a likely coaching outcome before signature.",
+      "salience": 3,
+      "payload": {
+        "evidence_id": "prep_note",
+        "summary": "Manager prep note is unsigned and non-authoritative."
+      }
+    },
+    {
+      "event_id": "hr-decision",
+      "kind": "decision",
+      "text": "Choose the source packet for the HR review summary.",
+      "salience": 10,
+      "payload": {
+        "correct_option_id": "use_signed_hr_case",
+        "required_constraints": [
+          "Use signed HR case records only.",
+          "Do not use manager prep notes as the official case source."
+        ],
+        "required_evidence": [
+          "signed_hr_case"
+        ],
+        "bias_if_constraints_missing": "use_prep_note",
+        "bias_if_evidence_missing": "use_prep_note",
+        "options": [
+          {
+            "option_id": "use_signed_hr_case",
+            "label": "Use the signed HR case record.",
+            "appeal": 1,
+            "supports_goal": true,
+            "supported_by": [
+              "signed_hr_case"
+            ],
+            "violates_constraints": [],
+            "evidence_to_accept": [
+              "signed_hr_case"
+            ],
+            "ledger_updates": {
+              "plan_steps": [
+                "Attach the signed HR case record to the review summary."
+              ]
+            }
+          },
+          {
+            "option_id": "use_prep_note",
+            "label": "Use the manager prep note because it is shorter.",
+            "appeal": 4,
+            "supports_goal": true,
+            "supported_by": [
+              "prep_note"
+            ],
+            "violates_constraints": [
+              "Use signed HR case records only.",
+              "Do not use manager prep notes as the official case source."
+            ],
+            "evidence_to_accept": [
+              "prep_note"
+            ],
+            "ledger_updates": {
+              "risk_flags": [
+                "HR review summary cites an unsigned prep note."
+              ]
+            },
+            "drift_label_if_chosen": "evidence_drift"
+          }
+        ]
+      }
+    }
+  ],
+  "gold_checkpoints": [
+    {
+      "checkpoint_id": "hr-cp-1",
+      "after_event_id": "hr-evidence-signed",
+      "required_constraints": [],
+      "required_evidence_ids": [
+        "signed_hr_case"
+      ],
+      "required_decisions": [],
+      "forbidden_drift_labels": [],
+      "required_fact_contents": [
+        "Signed HR case record confirms the coaching outcome."
+      ],
+      "required_outstanding_work": [
+        "Use the signed HR case record that directly supports the review summary."
+      ],
+      "required_active_subgoal": "select the signed HR case source for the summary",
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Signed HR case record confirms the coaching outcome.",
+          "evidence_ids": [
+            "signed_hr_case"
+          ]
+        }
+      ]
+    },
+    {
+      "checkpoint_id": "hr-cp-2",
+      "after_event_id": "hr-decision",
+      "required_constraints": [
+        "Use signed HR case records only.",
+        "Do not use manager prep notes as the official case source."
+      ],
+      "required_evidence_ids": [
+        "signed_hr_case"
+      ],
+      "required_decisions": [
+        "Use the signed HR case record."
+      ],
+      "forbidden_drift_labels": [
+        "evidence_drift"
+      ],
+      "required_fact_contents": [
+        "Signed HR case record confirms the coaching outcome."
+      ],
+      "required_ledger_decisions": [
+        "Use the signed HR case record."
+      ],
+      "required_outstanding_work": [
+        "Use the signed HR case record that directly supports the review summary.",
+        "Preserve provenance for the selected packet."
+      ],
+      "required_plan_steps": [
+        "Attach the signed HR case record to the review summary."
+      ],
+      "required_accepted_evidence_ids": [
+        "signed_hr_case"
+      ],
+      "required_active_subgoal": "select the signed HR case source for the summary",
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Signed HR case record confirms the coaching outcome.",
+          "evidence_ids": [
+            "signed_hr_case"
+          ]
+        },
+        {
+          "bucket": "decisions",
+          "content": "Use the signed HR case record.",
+          "evidence_ids": [
+            "signed_hr_case"
+          ]
+        }
+      ]
+    }
+  ],
+  "gold_outcome": {
+    "required_decision_ids": [
+      "use_signed_hr_case"
+    ]
+  },
+  "tags": [
+    "validation",
+    "wave2"
+  ]
+}

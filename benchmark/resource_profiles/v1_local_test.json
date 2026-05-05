@@ -1,0 +1,10 @@
+{
+  "version": "v1_local_test",
+  "name": "Local deterministic test profile",
+  "transcript_capacity": 3,
+  "summary_capacity": 2,
+  "retrieval_k": 2,
+  "max_steps": 14,
+  "max_visible_events": 4,
+  "seed": 37
+}

@@ -1,0 +1,5 @@
+example_id,scenario_id,family,reviewer_id,earliest_visible_drift_step,primary_drift_label,severity,recoverable,final_success,notes
+calibration-evidence-drift,validation_procurement_audit_packet,evidence_synthesis,,,,,,,
+calibration-constraint-drift,validation_access_review_reactivation,tool_state_workflow,,,,,,,
+calibration-memory-drift,validation_policy_supersession_credit,memory_update_conflict,,,,,,,
+calibration-goal-drift,validation_billing_chat_escalation,adversarial_untrusted_input,,,,,,,

@@ -1,0 +1,31 @@
+{
+  "name": "test_wave1_baselines",
+  "purpose": "First public locked test slice for final baseline context comparison under the deterministic harness.",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_test",
+  "manifest_stage": "test",
+  "scenarios": [
+    "test_airworthiness_certificate_packet",
+    "test_database_access_restore",
+    "test_rebate_window_reinstatement",
+    "test_vendor_wire_change_injection"
+  ],
+  "context_systems": [
+    "raw_transcript",
+    "summary_only",
+    "retrieval_only",
+    "ledger_only",
+    "ledger_retrieval",
+    "ledger_summary_retrieval"
+  ],
+  "detectors": [
+    "rule_based"
+  ],
+  "policies": [
+    "none"
+  ],
+  "notes": [
+    "This manifest is the first public locked test slice and should not be used for iteration.",
+    "Its purpose is final baseline comparison after development and validation work are complete."
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "test_wave2_selected_policy",
+  "purpose": "Expanded locked public test slice for checking whether the validation-selected detector and intervention generalize.",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_test",
+  "manifest_stage": "test",
+  "scenarios": [
+    "test_airworthiness_certificate_packet",
+    "test_sanctions_clearance_packet",
+    "test_database_access_restore",
+    "test_badge_reactivation_clearance_hold",
+    "test_rebate_window_reinstatement",
+    "test_freight_surcharge_window_closed",
+    "test_vendor_wire_change_injection",
+    "test_payroll_redirect_injection"
+  ],
+  "context_systems": [
+    "raw_transcript",
+    "summary_only",
+    "retrieval_only",
+    "ledger_only",
+    "ledger_retrieval",
+    "ledger_summary_retrieval"
+  ],
+  "detectors": [
+    "rule_based"
+  ],
+  "policies": [
+    "none",
+    "anchor_refresh"
+  ],
+  "notes": [
+    "This manifest is the locked public test slice for validating the selected intervention hypothesis from validation.",
+    "It compares the validation-preferred anchor_refresh policy against the no-intervention baseline under the rule_based detector."
+  ]
+}

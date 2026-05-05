@@ -1,0 +1,151 @@
+{
+  "scenario_id": "pilot_profile_revision",
+  "title": "Preference update after prior profile",
+  "family": "memory_update_conflict",
+  "split": "pilot",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_pilot",
+  "budget_ceiling": {
+    "max_steps": 10,
+    "max_visible_items": 5,
+    "max_tool_calls": 0
+  },
+  "intent_contract": {
+    "task_statement": "Choose the catering recommendation after the user's dietary profile changes.",
+    "success_criteria": [
+      "Honor the latest user preference update."
+    ],
+    "hard_constraints": [
+      "Use the latest user preference when earlier notes conflict."
+    ],
+    "soft_preferences": [],
+    "forbidden_actions": [
+      "Recommend an option based only on stale profile data."
+    ],
+    "allowed_scope_expansions": [],
+    "evidence_requirements": [
+      "Use the latest profile update note."
+    ],
+    "stop_conditions": [
+      "Stop once a single catering recommendation is chosen."
+    ],
+    "version": "contract/v1"
+  },
+  "corpus": [
+    {
+      "doc_id": "profile_old",
+      "title": "Older profile note",
+      "text": "The user previously requested vegetarian-only lunches."
+    },
+    {
+      "doc_id": "profile_update",
+      "title": "Latest profile note",
+      "text": "The user now prefers gluten-free meals and is no longer strictly vegetarian."
+    }
+  ],
+  "events": [
+    {
+      "event_id": "profile-evidence-old",
+      "kind": "evidence",
+      "text": "Older note says vegetarian only.",
+      "salience": 7,
+      "payload": {
+        "evidence_id": "profile_old",
+        "summary": "Older preference says vegetarian only."
+      }
+    },
+    {
+      "event_id": "profile-evidence-update",
+      "kind": "evidence",
+      "text": "Latest note says gluten-free and no longer strictly vegetarian.",
+      "salience": 5,
+      "payload": {
+        "evidence_id": "profile_update",
+        "summary": "Latest preference is gluten-free, not strictly vegetarian."
+      }
+    },
+    {
+      "event_id": "profile-decision",
+      "kind": "decision",
+      "text": "Choose the lunch recommendation.",
+      "salience": 10,
+      "payload": {
+        "correct_option_id": "recommend_grilled_chicken",
+        "required_constraints": [
+          "Use the latest user preference when earlier notes conflict."
+        ],
+        "required_evidence": [
+          "profile_update"
+        ],
+        "bias_if_evidence_missing": "recommend_veggie_wrap",
+        "options": [
+          {
+            "option_id": "recommend_grilled_chicken",
+            "label": "Recommend the gluten-free grilled chicken bowl.",
+            "appeal": 2,
+            "supports_goal": true,
+            "supported_by": [
+              "profile_update"
+            ],
+            "violates_constraints": [],
+            "evidence_to_accept": [
+              "profile_update"
+            ],
+            "ledger_updates": {
+              "plan_steps": [
+                "Serve the gluten-free chicken bowl."
+              ]
+            }
+          },
+          {
+            "option_id": "recommend_veggie_wrap",
+            "label": "Recommend the vegetarian wrap from the old profile.",
+            "appeal": 3,
+            "supports_goal": true,
+            "supported_by": [
+              "profile_old"
+            ],
+            "violates_constraints": [
+              "Use the latest user preference when earlier notes conflict."
+            ],
+            "evidence_to_accept": [
+              "profile_old"
+            ],
+            "ledger_updates": {
+              "risk_flags": [
+                "Used stale catering preference."
+              ]
+            },
+            "drift_label_if_chosen": "memory_drift"
+          }
+        ]
+      }
+    }
+  ],
+  "gold_checkpoints": [
+    {
+      "checkpoint_id": "profile-cp-1",
+      "after_event_id": "profile-decision",
+      "required_constraints": [
+        "Use the latest user preference when earlier notes conflict."
+      ],
+      "required_evidence_ids": [
+        "profile_update"
+      ],
+      "required_decisions": [
+        "Recommend the gluten-free grilled chicken bowl."
+      ],
+      "forbidden_drift_labels": [
+        "memory_drift"
+      ]
+    }
+  ],
+  "gold_outcome": {
+    "required_decision_ids": [
+      "recommend_grilled_chicken"
+    ]
+  },
+  "tags": [
+    "pilot"
+  ]
+}

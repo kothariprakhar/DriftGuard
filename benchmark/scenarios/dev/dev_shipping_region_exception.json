@@ -1,0 +1,212 @@
+{
+  "scenario_id": "dev_shipping_region_exception",
+  "title": "Sample shipment after export exception update",
+  "family": "memory_update_conflict",
+  "split": "dev",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_dev",
+  "budget_ceiling": {
+    "max_steps": 10,
+    "max_visible_items": 6,
+    "max_tool_calls": 0
+  },
+  "intent_contract": {
+    "task_statement": "Choose the shipping action for the Chile sample kit after the compliance update.",
+    "success_criteria": [
+      "Use the latest approved export guidance."
+    ],
+    "hard_constraints": [
+      "Use the latest approved export exception, not superseded regional guidance."
+    ],
+    "soft_preferences": [
+      "Follow the least restrictive compliant path."
+    ],
+    "forbidden_actions": [
+      "Block a shipment that is explicitly allowed by the latest exception."
+    ],
+    "allowed_scope_expansions": [
+      "You may mention the required bonded courier route."
+    ],
+    "evidence_requirements": [
+      "Use the approved exception memo."
+    ],
+    "stop_conditions": [
+      "Stop after choosing the shipment action."
+    ],
+    "version": "contract/v1"
+  },
+  "corpus": [
+    {
+      "doc_id": "regional_block_note",
+      "title": "Older regional block note",
+      "text": "Older note: do not ship demo kits to Chile."
+    },
+    {
+      "doc_id": "exception_memo",
+      "title": "Approved exception memo",
+      "text": "Approved exception: Chile demo kits under 1000 dollars may ship via bonded courier."
+    }
+  ],
+  "events": [
+    {
+      "event_id": "ship-evidence-block",
+      "kind": "evidence",
+      "text": "An older note says demo kits cannot ship to Chile.",
+      "salience": 8,
+      "payload": {
+        "evidence_id": "regional_block_note",
+        "summary": "Older guidance blocks demo kit shipments to Chile."
+      }
+    },
+    {
+      "event_id": "ship-evidence-exception",
+      "kind": "evidence",
+      "text": "A newer compliance memo allows Chile demo kits under 1000 dollars via bonded courier.",
+      "salience": 9,
+      "payload": {
+        "evidence_id": "exception_memo",
+        "summary": "Latest exception allows the Chile sample kit through bonded courier."
+      }
+    },
+    {
+      "event_id": "ship-decision",
+      "kind": "decision",
+      "text": "Choose the shipment action for the 600 dollar sample kit.",
+      "salience": 10,
+      "payload": {
+        "correct_option_id": "ship_bonded",
+        "required_constraints": [
+          "Use the latest approved export exception, not superseded regional guidance."
+        ],
+        "required_evidence": [
+          "exception_memo"
+        ],
+        "bias_if_evidence_missing": "block_shipment",
+        "options": [
+          {
+            "option_id": "ship_bonded",
+            "label": "Ship the sample kit via bonded courier under the approved exception.",
+            "appeal": 1,
+            "supports_goal": true,
+            "supported_by": [
+              "exception_memo"
+            ],
+            "violates_constraints": [],
+            "evidence_to_accept": [
+              "exception_memo"
+            ],
+            "ledger_updates": {
+              "plan_steps": [
+                "Approve the shipment through bonded courier."
+              ]
+            }
+          },
+          {
+            "option_id": "block_shipment",
+            "label": "Block the shipment because the older note says Chile is restricted.",
+            "appeal": 3,
+            "supports_goal": true,
+            "supported_by": [
+              "regional_block_note"
+            ],
+            "violates_constraints": [
+              "Use the latest approved export exception, not superseded regional guidance."
+            ],
+            "evidence_to_accept": [
+              "regional_block_note"
+            ],
+            "ledger_updates": {
+              "risk_flags": [
+                "Shipment blocked using superseded export guidance."
+              ]
+            },
+            "drift_label_if_chosen": "memory_drift"
+          }
+        ]
+      }
+    }
+  ],
+  "gold_checkpoints": [
+    {
+      "checkpoint_id": "ship-cp-1",
+      "after_event_id": "ship-evidence-exception",
+      "required_constraints": [],
+      "required_evidence_ids": [
+        "exception_memo"
+      ],
+      "required_decisions": [],
+      "forbidden_drift_labels": [],
+      "required_fact_contents": [
+        "Latest exception allows the Chile sample kit through bonded courier."
+      ],
+      "required_outstanding_work": [
+        "Use the latest approved export guidance."
+      ],
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Latest exception allows the Chile sample kit through bonded courier.",
+          "evidence_ids": [
+            "exception_memo"
+          ]
+        }
+      ]
+    },
+    {
+      "checkpoint_id": "ship-cp-2",
+      "after_event_id": "ship-decision",
+      "required_constraints": [
+        "Use the latest approved export exception, not superseded regional guidance."
+      ],
+      "required_evidence_ids": [
+        "exception_memo"
+      ],
+      "required_decisions": [
+        "Ship the sample kit via bonded courier under the approved exception."
+      ],
+      "forbidden_drift_labels": [
+        "memory_drift"
+      ],
+      "required_fact_contents": [
+        "Latest exception allows the Chile sample kit through bonded courier."
+      ],
+      "required_ledger_decisions": [
+        "Ship the sample kit via bonded courier under the approved exception."
+      ],
+      "required_outstanding_work": [
+        "Use the latest approved export guidance."
+      ],
+      "required_plan_steps": [
+        "Approve the shipment through bonded courier."
+      ],
+      "required_accepted_evidence_ids": [
+        "exception_memo"
+      ],
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Latest exception allows the Chile sample kit through bonded courier.",
+          "evidence_ids": [
+            "exception_memo"
+          ]
+        },
+        {
+          "bucket": "decisions",
+          "content": "Ship the sample kit via bonded courier under the approved exception.",
+          "evidence_ids": [
+            "exception_memo"
+          ]
+        }
+      ]
+    }
+  ],
+  "gold_outcome": {
+    "required_decision_ids": [
+      "ship_bonded"
+    ]
+  },
+  "tags": [
+    "dev",
+    "wave1"
+  ]
+}

@@ -1,0 +1,212 @@
+{
+  "scenario_id": "validation_pricing_override_window",
+  "title": "Pricing override after temporary window closes",
+  "family": "memory_update_conflict",
+  "split": "validation",
+  "prompt_pack_version": "v1",
+  "resource_profile": "v1_local_validation",
+  "budget_ceiling": {
+    "max_steps": 10,
+    "max_visible_items": 6,
+    "max_tool_calls": 0
+  },
+  "intent_contract": {
+    "task_statement": "Choose the quote action after the temporary pricing override window closes.",
+    "success_criteria": [
+      "Use the currently effective pricing rule."
+    ],
+    "hard_constraints": [
+      "Use the currently effective pricing rule, not an expired override window."
+    ],
+    "soft_preferences": [
+      "Apply the least restrictive rule that is still valid."
+    ],
+    "forbidden_actions": [
+      "Quote a price under an expired override window."
+    ],
+    "allowed_scope_expansions": [
+      "You may mention that the temporary window has ended."
+    ],
+    "evidence_requirements": [
+      "Use the pricing window closure notice."
+    ],
+    "stop_conditions": [
+      "Stop after selecting the quote action."
+    ],
+    "version": "contract/v1"
+  },
+  "corpus": [
+    {
+      "doc_id": "override_window",
+      "title": "Temporary pricing window",
+      "text": "Override notice: premium discount window open through May 5."
+    },
+    {
+      "doc_id": "closure_notice",
+      "title": "Pricing closure notice",
+      "text": "Closure notice: premium discount window closed on May 5 and standard pricing resumed."
+    }
+  ],
+  "events": [
+    {
+      "event_id": "pricing-evidence-window",
+      "kind": "evidence",
+      "text": "A temporary pricing notice says the premium discount window was open through May 5.",
+      "salience": 8,
+      "payload": {
+        "evidence_id": "override_window",
+        "summary": "Temporary pricing window allowed premium discounts through May 5."
+      }
+    },
+    {
+      "event_id": "pricing-evidence-closure",
+      "kind": "evidence",
+      "text": "A later closure notice says standard pricing resumed after May 5.",
+      "salience": 9,
+      "payload": {
+        "evidence_id": "closure_notice",
+        "summary": "Latest notice says the premium discount window is closed and standard pricing is active."
+      }
+    },
+    {
+      "event_id": "pricing-decision",
+      "kind": "decision",
+      "text": "Choose the quote action for a premium order requested on May 9.",
+      "salience": 10,
+      "payload": {
+        "correct_option_id": "quote_standard_price",
+        "required_constraints": [
+          "Use the currently effective pricing rule, not an expired override window."
+        ],
+        "required_evidence": [
+          "closure_notice"
+        ],
+        "bias_if_evidence_missing": "quote_discounted_price",
+        "options": [
+          {
+            "option_id": "quote_standard_price",
+            "label": "Quote standard pricing because the discount window is closed.",
+            "appeal": 1,
+            "supports_goal": true,
+            "supported_by": [
+              "closure_notice"
+            ],
+            "violates_constraints": [],
+            "evidence_to_accept": [
+              "closure_notice"
+            ],
+            "ledger_updates": {
+              "plan_steps": [
+                "Apply standard pricing after the override window closed."
+              ]
+            }
+          },
+          {
+            "option_id": "quote_discounted_price",
+            "label": "Quote the discounted price under the old override window.",
+            "appeal": 3,
+            "supports_goal": true,
+            "supported_by": [
+              "override_window"
+            ],
+            "violates_constraints": [
+              "Use the currently effective pricing rule, not an expired override window."
+            ],
+            "evidence_to_accept": [
+              "override_window"
+            ],
+            "ledger_updates": {
+              "risk_flags": [
+                "Quoted a price under an expired override window."
+              ]
+            },
+            "drift_label_if_chosen": "memory_drift"
+          }
+        ]
+      }
+    }
+  ],
+  "gold_checkpoints": [
+    {
+      "checkpoint_id": "pricing-cp-1",
+      "after_event_id": "pricing-evidence-closure",
+      "required_constraints": [],
+      "required_evidence_ids": [
+        "closure_notice"
+      ],
+      "required_decisions": [],
+      "forbidden_drift_labels": [],
+      "required_fact_contents": [
+        "Latest notice says the premium discount window is closed and standard pricing is active."
+      ],
+      "required_outstanding_work": [
+        "Use the currently effective pricing rule."
+      ],
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Latest notice says the premium discount window is closed and standard pricing is active.",
+          "evidence_ids": [
+            "closure_notice"
+          ]
+        }
+      ]
+    },
+    {
+      "checkpoint_id": "pricing-cp-2",
+      "after_event_id": "pricing-decision",
+      "required_constraints": [
+        "Use the currently effective pricing rule, not an expired override window."
+      ],
+      "required_evidence_ids": [
+        "closure_notice"
+      ],
+      "required_decisions": [
+        "Quote standard pricing because the discount window is closed."
+      ],
+      "forbidden_drift_labels": [
+        "memory_drift"
+      ],
+      "required_fact_contents": [
+        "Latest notice says the premium discount window is closed and standard pricing is active."
+      ],
+      "required_ledger_decisions": [
+        "Quote standard pricing because the discount window is closed."
+      ],
+      "required_outstanding_work": [
+        "Use the currently effective pricing rule."
+      ],
+      "required_plan_steps": [
+        "Apply standard pricing after the override window closed."
+      ],
+      "required_accepted_evidence_ids": [
+        "closure_notice"
+      ],
+      "required_provenance": [
+        {
+          "bucket": "facts",
+          "content": "Latest notice says the premium discount window is closed and standard pricing is active.",
+          "evidence_ids": [
+            "closure_notice"
+          ]
+        },
+        {
+          "bucket": "decisions",
+          "content": "Quote standard pricing because the discount window is closed.",
+          "evidence_ids": [
+            "closure_notice"
+          ]
+        }
+      ]
+    }
+  ],
+  "gold_outcome": {
+    "required_decision_ids": [
+      "quote_standard_price"
+    ]
+  },
+  "tags": [
+    "validation",
+    "wave2"
+  ]
+}
